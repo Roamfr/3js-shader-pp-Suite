@@ -130,16 +130,16 @@ A single-page React application with:
 
 **Tasks and deliverables:**
 
-- [ ] `src/components/Scene/ProceduralScene.tsx` — Built-in: metallic sphere + rough sphere + torus knot + ground plane
-- [ ] `src/components/Scene/MaterialSpheres.tsx` — Grid of spheres with varying roughness/metalness (Khronos-style)
-- [ ] `src/components/Scene/EnvironmentScene.tsx` — Damaged Helmet or similar GLTF from Khronos samples
-- [ ] `src/components/Scene/CustomGLTFScene.tsx` — Load user-uploaded GLTF via `useGLTF` with Draco support
-- [ ] `src/components/Scene/SceneSelector.tsx` — Dropdown per-tile or global scene switch
-- [ ] `src/lib/gltfValidator.ts` — File size limit (50MB), basic validation, sanitization (strip embedded scripts)
-- [ ] `src/components/Scene/SceneLighting.tsx` — Consistent lighting setup: `<Environment preset="studio">` + directional light + ambient
-- [ ] Bundle built-in GLTF models in `public/models/` (DamagedHelmet.glb, Suzanne.glb, ClawMachine.glb)
-- [ ] Shared geometry instances across tiles (procedural geometries created once, reused)
-- [ ] Note: ClawMachine.glb is loaded as a static scene for now. Interactive game mode (physics, input, animation state) can be added later by refactoring TileView to support a `sceneMode: "viewer" | "interactive"` prop.
+- [x] `src/components/Scene/ProceduralScene.tsx` — Built-in: metallic sphere + rough sphere + torus knot + ground plane
+- [x] `src/components/Scene/MaterialSpheres.tsx` — Grid of spheres with varying roughness/metalness (Khronos-style)
+- [x] `src/components/Scene/EnvironmentScene.tsx` — Damaged Helmet or similar GLTF from Khronos samples
+- [x] `src/components/Scene/CustomGLTFScene.tsx` — Load user-uploaded GLTF via `useGLTF` with Draco support
+- [x] `src/components/Scene/SceneSelector.tsx` — Dropdown per-tile or global scene switch
+- [x] `src/lib/gltfValidator.ts` — File size limit (50MB), basic validation, sanitization (strip embedded scripts)
+- [x] `src/components/Scene/SceneLighting.tsx` — Consistent lighting setup: `<Environment preset="studio">` + directional light + ambient
+- [x] Bundle built-in GLTF models in `public/models/` (DamagedHelmet.glb, Duck.glb, ClawMachine.glb)
+- [x] Shared geometry instances across tiles (procedural geometries created once, reused)
+- [x] Note: ClawMachine.glb is loaded as a static scene for now. Interactive game mode (physics, input, animation state) can be added later by refactoring TileView to support a `sceneMode: "viewer" | "interactive"` prop.
 
 **Success criteria:**
 - [ ] Can switch scenes per-tile and globally
@@ -153,14 +153,14 @@ A single-page React application with:
 
 **Tasks and deliverables:**
 
-- [ ] `src/lib/uniformParser.ts` — Parse GLSL source to extract uniform declarations: name, type (`float`, `vec2`, `vec3`, `vec4`, `bool`, `int`), infer reasonable min/max/step defaults
-- [ ] `src/components/Controls/UniformPanel.tsx` — Auto-generated controls: sliders for floats, color pickers for vec3 colors, number inputs for vec2/vec4, checkboxes for bools
-- [ ] `src/components/Controls/UniformSlider.tsx` — Range slider with label, value display, reset-to-default button
-- [ ] `src/components/Controls/ColorUniform.tsx` — Color picker mapped to vec3/vec4 uniform
-- [ ] `src/components/CodeViewer/CodePanel.tsx` — Syntax-highlighted GLSL display (vertex + fragment tabs) using a lightweight highlighter (Prism or Shiki)
-- [ ] `src/components/CodeViewer/CodeEditor.tsx` — Editable mode with debounced recompilation on change (500ms debounce)
-- [ ] Copy-to-clipboard button for shader code
-- [ ] Real-time uniform updates via `useFrame` (no re-render, direct uniform mutation)
+- [x] `src/lib/uniformParser.ts` — Parse GLSL source to extract uniform declarations: name, type (`float`, `vec2`, `vec3`, `vec4`, `bool`, `int`), infer reasonable min/max/step defaults
+- [x] `src/components/Controls/UniformPanel.tsx` — Auto-generated controls: sliders for floats, color pickers for vec3 colors, number inputs for vec2/vec4, checkboxes for bools
+- [x] `src/components/Controls/UniformSlider.tsx` — Range slider with label, value display, reset-to-default button
+- [x] `src/components/Controls/ColorUniform.tsx` — Color picker mapped to vec3/vec4 uniform
+- [x] `src/components/CodeViewer/CodePanel.tsx` — Syntax-highlighted GLSL display (vertex + fragment tabs) using a lightweight highlighter (Prism or Shiki)
+- [x] `src/components/CodeViewer/CodeEditor.tsx` — Editable mode with debounced recompilation on change (500ms debounce)
+- [x] Copy-to-clipboard button for shader code
+- [x] Real-time uniform updates via `useFrame` (no re-render, direct uniform mutation)
 
 **Success criteria:**
 - [ ] Changing a slider immediately updates the rendered effect
