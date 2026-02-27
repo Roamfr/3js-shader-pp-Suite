@@ -11,6 +11,9 @@ interface UIStore {
   apiKey: string
   importDialogOpen: boolean
   exportDialogOpen: boolean
+  diffDialogOpen: boolean
+  showFPS: boolean
+  sidebarCollapsed: boolean
 
   selectTile: (id: string | null) => void
   setSidebarPanel: (panel: SidebarPanel) => void
@@ -19,6 +22,9 @@ interface UIStore {
   setApiKey: (key: string) => void
   setImportDialogOpen: (open: boolean) => void
   setExportDialogOpen: (open: boolean) => void
+  setDiffDialogOpen: (open: boolean) => void
+  toggleFPS: () => void
+  toggleSidebar: () => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -29,6 +35,9 @@ export const useUIStore = create<UIStore>((set) => ({
   apiKey: localStorage.getItem('anthropic-api-key') ?? '',
   importDialogOpen: false,
   exportDialogOpen: false,
+  diffDialogOpen: false,
+  showFPS: false,
+  sidebarCollapsed: false,
 
   selectTile: (id) => set({ selectedTileId: id }),
   setSidebarPanel: (panel) => set({ sidebarPanel: panel }),
@@ -40,4 +49,7 @@ export const useUIStore = create<UIStore>((set) => ({
   },
   setImportDialogOpen: (open) => set({ importDialogOpen: open }),
   setExportDialogOpen: (open) => set({ exportDialogOpen: open }),
+  setDiffDialogOpen: (open) => set({ diffDialogOpen: open }),
+  toggleFPS: () => set((state) => ({ showFPS: !state.showFPS })),
+  toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 }))

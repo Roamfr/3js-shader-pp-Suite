@@ -100,7 +100,7 @@ interface PostEffectLayerProps {
  *    scissor rect. The quad covers the viewport, showing the processed image.
  */
 export function PostEffectLayer({ effects }: PostEffectLayerProps) {
-  const { gl, scene, camera, size } = useThree()
+  const { gl, size } = useThree()
   const quadRef = useRef<THREE.Mesh>(null!)
 
   // FBO sized to match the View portal

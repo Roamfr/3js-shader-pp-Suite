@@ -145,6 +145,7 @@ export function importShaderSource(source: string, name: string = 'Imported Shad
         detectedFormat: 'vertex',
       }
     case 'unknown':
+    default:
       // Try as material fragment (most permissive)
       return {
         success: true,

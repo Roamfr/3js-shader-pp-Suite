@@ -1,5 +1,3 @@
-import type { Side } from 'three'
-
 export interface UniformConfig {
   type: 'float' | 'int' | 'bool' | 'vec2' | 'vec3' | 'vec4'
   value: number | number[] | boolean

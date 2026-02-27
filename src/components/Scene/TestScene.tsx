@@ -1,5 +1,3 @@
-import { MeshStandardMaterial } from 'three'
-
 export function TestScene() {
   return (
     <group>

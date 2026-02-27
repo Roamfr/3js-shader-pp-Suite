@@ -17,7 +17,7 @@ function LoadedModel({ url }: { url: string }) {
   return <primitive object={clonedScene} />
 }
 
-export function CustomGLTFScene({ shader: _shader, modelUrl, onError }: CustomGLTFSceneProps) {
+export function CustomGLTFScene({ shader: _shader, modelUrl, onError: _onError }: CustomGLTFSceneProps) {
   return (
     <group>
       {modelUrl ? (

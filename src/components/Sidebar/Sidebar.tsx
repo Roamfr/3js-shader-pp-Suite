@@ -5,6 +5,7 @@ import { SceneSelector } from '../Scene/SceneSelector'
 import { UniformPanel } from '../Controls/UniformPanel'
 import { CodePanel } from '../CodeViewer/CodePanel'
 import { PresetLibrary } from '../Presets/PresetLibrary'
+import { EffectChain } from '../Effects/EffectChain'
 import { useUIStore } from '../../store/uiStore'
 
 type SidebarPanel = 'prompt' | 'controls' | 'code'
@@ -46,8 +47,12 @@ export function Sidebar() {
   const setSidebarPanel = useUIStore((s) => s.setSidebarPanel)
   const cameraSyncEnabled = useUIStore((s) => s.cameraSyncEnabled)
   const toggleCameraSync = useUIStore((s) => s.toggleCameraSync)
+  const showFPS = useUIStore((s) => s.showFPS)
+  const toggleFPS = useUIStore((s) => s.toggleFPS)
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const setImportDialogOpen = useUIStore((s) => s.setImportDialogOpen)
   const setExportDialogOpen = useUIStore((s) => s.setExportDialogOpen)
+  const setDiffDialogOpen = useUIStore((s) => s.setDiffDialogOpen)
 
   return (
     <aside
@@ -67,14 +72,33 @@ export function Sidebar() {
         style={{
           padding: '12px 16px',
           borderBottom: '1px solid #222',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 14, color: '#eee', fontWeight: 600 }}>
-          Shader Eval Suite
-        </h1>
-        <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
-          Three.js GLSL Gallery
+        <div>
+          <h1 style={{ margin: 0, fontSize: 14, color: '#eee', fontWeight: 600 }}>
+            Shader Eval Suite
+          </h1>
+          <div style={{ fontSize: 11, color: '#666', marginTop: 2 }}>
+            Three.js GLSL Gallery
+          </div>
         </div>
+        <button
+          onClick={toggleSidebar}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#666',
+            cursor: 'pointer',
+            fontSize: 16,
+            padding: '4px',
+          }}
+          title="Collapse sidebar"
+        >
+          &#x2039;
+        </button>
       </div>
 
       {/* Panel tabs */}
@@ -149,7 +173,7 @@ export function Sidebar() {
               <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Import / Export
               </h2>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button
                   style={actionBtnStyle}
                   onClick={() => setImportDialogOpen(true)}
@@ -161,6 +185,12 @@ export function Sidebar() {
                   onClick={() => setExportDialogOpen(true)}
                 >
                   Export
+                </button>
+                <button
+                  style={actionBtnStyle}
+                  onClick={() => setDiffDialogOpen(true)}
+                >
+                  Diff
                 </button>
               </div>
             </section>
@@ -190,23 +220,50 @@ export function Sidebar() {
               </label>
             </section>
 
-            {/* API Key */}
+            {/* API Key & Settings */}
             <section>
               <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
                 Settings
               </h2>
               <APIKeyInput />
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  color: '#ccc',
+                  marginTop: 8,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={showFPS}
+                  onChange={toggleFPS}
+                  style={{ accentColor: '#3b82f6' }}
+                />
+                Show FPS overlay
+              </label>
             </section>
           </>
         )}
 
         {sidebarPanel === 'controls' && (
-          <section>
-            <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
-              Uniforms
-            </h2>
-            <UniformPanel />
-          </section>
+          <>
+            <section>
+              <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Uniforms
+              </h2>
+              <UniformPanel />
+            </section>
+            <section>
+              <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Effect Chain
+              </h2>
+              <EffectChain />
+            </section>
+          </>
         )}
 
         {sidebarPanel === 'code' && (

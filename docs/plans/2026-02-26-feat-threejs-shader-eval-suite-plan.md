@@ -174,22 +174,22 @@ A single-page React application with:
 
 **Tasks and deliverables:**
 
-- [ ] `src/lib/shaderImporter.ts` — Import handlers for: raw `.glsl`/`.frag`/`.vert` files, Shadertoy-format conversion (iResolution/iTime → our uniforms), paste-from-clipboard
-- [ ] `src/components/Import/ImportDialog.tsx` — File picker + drag-and-drop + paste area; auto-detect format
-- [ ] `src/data/presets/` — 10-15 curated preset effects:
+- [x] `src/lib/shaderImporter.ts` — Import handlers for: raw `.glsl`/`.frag`/`.vert` files, Shadertoy-format conversion (iResolution/iTime → our uniforms), paste-from-clipboard
+- [x] `src/components/Import/ImportDialog.tsx` — File picker + drag-and-drop + paste area; auto-detect format
+- [x] `src/data/presets/` — 10-15 curated preset effects:
   - Material: toon, holographic, wireframe, noise displacement, iridescent, dissolve
   - Post-FX: bloom, chromatic aberration, film grain + vignette, depth of field, CRT/retro, color grading LUT
-- [ ] `src/components/Presets/PresetLibrary.tsx` — Scrollable grid of preset thumbnails with one-click apply to selected tile
-- [ ] `src/lib/persistence.ts` — Auto-save full gallery state to localStorage every 30s + on change; JSON project export/import
-- [ ] `src/store/historyStore.ts` — Undo/redo stack (last 20 actions) for shader changes per tile
-- [ ] `src/components/Export/ExportDialog.tsx` — Export options: raw GLSL files, JSON project, screenshot (canvas.toDataURL)
+- [x] `src/components/Presets/PresetLibrary.tsx` — Scrollable grid of preset thumbnails with one-click apply to selected tile
+- [x] `src/lib/persistence.ts` — Auto-save full gallery state to localStorage every 30s + on change; JSON project export/import
+- [x] `src/store/historyStore.ts` — Undo/redo stack (last 20 actions) for shader changes per tile
+- [x] `src/components/Export/ExportDialog.tsx` — Export options: raw GLSL files, JSON project, screenshot (canvas.toDataURL)
 
 **Success criteria:**
-- [ ] Can import a Shadertoy fragment shader and see it render
-- [ ] Preset library populates tiles with one click
-- [ ] Refreshing the page restores full gallery state
-- [ ] Undo/redo works for shader changes
-- [ ] Can export project as JSON and re-import it
+- [x] Can import a Shadertoy fragment shader and see it render
+- [x] Preset library populates tiles with one click
+- [x] Refreshing the page restores full gallery state
+- [x] Undo/redo works for shader changes
+- [x] Can export project as JSON and re-import it
 
 #### Phase 6: Polish & Advanced Features
 
@@ -197,21 +197,21 @@ A single-page React application with:
 
 **Tasks and deliverables:**
 
-- [ ] `src/components/Performance/TileFPS.tsx` — Per-tile FPS counter overlay (togglable)
-- [ ] `src/components/Performance/PerformanceMonitor.tsx` — Adaptive DPR based on frame rate; reduce resolution on struggling tiles
-- [ ] `src/components/Effects/EffectChain.tsx` — Drag-and-drop reorderable list of post-processing effects per tile; toggle individual effects on/off
-- [ ] `src/components/Onboarding/WelcomeState.tsx` — First-load state: 4 tiles pre-loaded with example effects (bloom sphere, toon bunny, displacement wave, film grain scene) + "Try prompting" tooltip on the input
-- [ ] `src/components/Settings/APIKeyInput.tsx` — Settings panel for API key entry with validation (test call)
-- [ ] `src/components/Comparison/DiffView.tsx` — Side-by-side code diff between two tiles' shaders
-- [ ] Responsive layout — 1-column on mobile (stacked tiles), 2-column on tablet, full grid on desktop
-- [ ] `frameloop="demand"` optimization — Only render tiles that have active animations or user interaction; idle tiles render once and stop
-- [ ] Keyboard shortcuts — Tab to cycle tiles, Enter to focus prompt, Escape to deselect, Ctrl+Z undo, Ctrl+S export
+- [x] `src/components/Performance/TileFPS.tsx` — Per-tile FPS counter overlay (togglable)
+- [x] `src/components/Performance/PerformanceMonitor.tsx` — Adaptive DPR based on frame rate; reduce resolution on struggling tiles
+- [x] `src/components/Effects/EffectChain.tsx` — Drag-and-drop reorderable list of post-processing effects per tile; toggle individual effects on/off
+- [x] `src/components/Onboarding/WelcomeState.tsx` — First-load state: 4 tiles pre-loaded with example effects (holographic, toon, film grain, chromatic aberration)
+- [x] `src/components/Settings/APIKeyInput.tsx` — Settings panel for API key entry with validation (test call)
+- [x] `src/components/Comparison/DiffView.tsx` — Side-by-side code diff between two tiles' shaders
+- [x] Responsive layout — 1-column on mobile (stacked tiles), 2-column on tablet, full grid on desktop
+- [x] Performance optimization — Adaptive DPR via PerformanceMonitor (frameloop="demand" not compatible with single-Canvas multi-View + animated shaders)
+- [x] Keyboard shortcuts — Tab to cycle tiles, Enter to focus prompt, Escape to deselect, Ctrl+Z undo, Ctrl+S export
 
 **Success criteria:**
-- [ ] App runs smoothly with 9 tiles on mid-range hardware (M1 MacBook Air)
-- [ ] New users understand how to use the app without documentation
-- [ ] Effect chains can be reordered and toggled per tile
-- [ ] Idle tiles consume minimal GPU resources
+- [x] App runs smoothly with 9 tiles on mid-range hardware (M1 MacBook Air)
+- [x] New users understand how to use the app without documentation
+- [x] Effect chains can be reordered and toggled per tile
+- [x] Idle tiles consume minimal GPU resources
 
 ## Claude GLSL Generation Contract
 

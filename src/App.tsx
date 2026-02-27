@@ -5,14 +5,18 @@ import { Sidebar } from './components/Sidebar/Sidebar'
 import { GalleryGrid } from './components/Gallery/GalleryGrid'
 import { ImportDialog } from './components/Import/ImportDialog'
 import { ExportDialog } from './components/Export/ExportDialog'
+import { DiffView } from './components/Comparison/DiffView'
+import { PerformanceMonitor } from './components/Performance/PerformanceMonitor'
+import { WelcomeState } from './components/Onboarding/WelcomeState'
 import { useGalleryStore } from './store/galleryStore'
 import { useUIStore } from './store/uiStore'
 import { useUndoRedo } from './store/historyStore'
 import { saveGalleryState } from './lib/persistence'
 
 export default function App() {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null!)
   const { undo, redo } = useUndoRedo()
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed)
 
   // Debounced persistence: save gallery state 2s after changes
   useEffect(() => {
@@ -42,29 +46,64 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey
+      const ui = useUIStore.getState()
+      const gallery = useGalleryStore.getState()
+
+      // Skip shortcuts when typing in an input/textarea
+      const tag = (e.target as HTMLElement)?.tagName
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA'
 
       // Ctrl/Cmd+Z = undo, Ctrl/Cmd+Shift+Z = redo
       if (mod && e.key === 'z' && !e.shiftKey) {
         e.preventDefault()
-        const tileId = useUIStore.getState().selectedTileId
-        if (tileId) undo(tileId)
+        if (ui.selectedTileId) undo(ui.selectedTileId)
       }
       if (mod && e.key === 'z' && e.shiftKey) {
         e.preventDefault()
-        const tileId = useUIStore.getState().selectedTileId
-        if (tileId) redo(tileId)
+        if (ui.selectedTileId) redo(ui.selectedTileId)
       }
 
       // Ctrl/Cmd+I = import
       if (mod && e.key === 'i') {
         e.preventDefault()
-        useUIStore.getState().setImportDialogOpen(true)
+        ui.setImportDialogOpen(true)
       }
 
       // Ctrl/Cmd+S = export (prevent browser save)
       if (mod && e.key === 's') {
         e.preventDefault()
-        useUIStore.getState().setExportDialogOpen(true)
+        ui.setExportDialogOpen(true)
+      }
+
+      // Non-modifier shortcuts (only when not in input)
+      if (!isInput && !mod) {
+        // Tab = cycle tiles
+        if (e.key === 'Tab') {
+          e.preventDefault()
+          const tiles = gallery.tiles
+          if (tiles.length === 0) return
+          const idx = tiles.findIndex((t) => t.id === ui.selectedTileId)
+          const next = e.shiftKey
+            ? (idx <= 0 ? tiles.length - 1 : idx - 1)
+            : (idx + 1) % tiles.length
+          ui.selectTile(tiles[next].id)
+        }
+
+        // Escape = deselect tile
+        if (e.key === 'Escape') {
+          ui.selectTile(null)
+        }
+
+        // Enter = focus prompt input
+        if (e.key === 'Enter') {
+          const promptInput = document.querySelector<HTMLTextAreaElement>(
+            '[data-prompt-input]'
+          )
+          if (promptInput) {
+            e.preventDefault()
+            promptInput.focus()
+          }
+        }
       }
     }
 
@@ -87,7 +126,7 @@ export default function App() {
       }}
     >
       {/* Sidebar */}
-      <Sidebar />
+      {!sidebarCollapsed && <Sidebar />}
 
       {/* Gallery area — contains both the HTML grid and the Canvas */}
       <main style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
@@ -102,13 +141,39 @@ export default function App() {
           style={{ position: 'absolute', inset: 0 }}
           gl={{ antialias: true }}
         >
+          <PerformanceMonitor />
           <View.Port />
         </Canvas>
       </main>
 
+      {/* Sidebar toggle when collapsed */}
+      {sidebarCollapsed && (
+        <button
+          onClick={() => useUIStore.getState().toggleSidebar()}
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 10,
+            padding: '6px 10px',
+            background: '#1a1a2e',
+            border: '1px solid #333',
+            borderRadius: 6,
+            color: '#ccc',
+            cursor: 'pointer',
+            fontSize: 14,
+          }}
+          title="Show sidebar"
+        >
+          &#9776;
+        </button>
+      )}
+
       {/* Dialogs */}
+      <WelcomeState />
       <ImportDialog />
       <ExportDialog />
+      <DiffView />
     </div>
   )
 }

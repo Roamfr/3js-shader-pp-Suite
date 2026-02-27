@@ -119,6 +119,7 @@ export function PromptInput() {
       </div>
 
       <textarea
+        data-prompt-input
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleKeyDown}

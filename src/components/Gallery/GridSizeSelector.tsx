@@ -13,7 +13,7 @@ export function GridSizeSelector() {
 
   return (
     <div style={{ display: 'flex', gap: 4 }}>
-      {GRID_OPTIONS.map(({ value, label }) => (
+      {GRID_OPTIONS.map(({ value }) => (
         <button
           key={value}
           onClick={() => setGridSize(value)}

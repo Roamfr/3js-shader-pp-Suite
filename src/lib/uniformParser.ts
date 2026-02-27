@@ -4,15 +4,6 @@ import type { UniformConfig } from '../types/shader'
 // Also captures optional // comment with hints like min:0 max:10 step:0.1
 const UNIFORM_RE = /^\s*uniform\s+(float|int|bool|vec2|vec3|vec4)\s+(\w+)\s*;(?:\s*\/\/\s*(.*))?$/gm
 
-interface ParsedUniform {
-  name: string
-  type: UniformConfig['type']
-  min?: number
-  max?: number
-  step?: number
-  value: number | number[] | boolean
-}
-
 // Built-in uniforms that the host app manages (skip these)
 const BUILTIN_UNIFORMS = new Set([
   'time',

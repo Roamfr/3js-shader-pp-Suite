@@ -1,4 +1,4 @@
-import { Suspense, useRef, useCallback } from 'react'
+import { Suspense, useRef, useCallback, useState } from 'react'
 import { View, PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import { useUIStore } from '../../store/uiStore'
 import { useGalleryStore } from '../../store/galleryStore'
@@ -8,6 +8,7 @@ import { EnvironmentScene } from '../Scene/EnvironmentScene'
 import { CustomGLTFScene } from '../Scene/CustomGLTFScene'
 import { PostEffectLayer } from '../Shader/PostEffectLayer'
 import { RenderErrorBoundary } from '../Error/RenderErrorBoundary'
+import { TileFPSCounter, TileFPSOverlay } from '../Performance/TileFPS'
 import { TileLabel } from './TileLabel'
 import { TileControls } from './TileControls'
 import type { TileConfig, CameraState } from '../../types/tile'
@@ -35,6 +36,8 @@ export function TileView({ tile }: TileViewProps) {
   const selectedTileId = useUIStore((s) => s.selectedTileId)
   const selectTile = useUIStore((s) => s.selectTile)
   const cameraSyncEnabled = useUIStore((s) => s.cameraSyncEnabled)
+  const showFPS = useUIStore((s) => s.showFPS)
+  const [fps, setFps] = useState(0)
   const clearTile = useGalleryStore((s) => s.clearTile)
   const duplicateTile = useGalleryStore((s) => s.duplicateTile)
   const syncCameraToAll = useGalleryStore((s) => s.syncCameraToAll)
@@ -87,6 +90,7 @@ export function TileView({ tile }: TileViewProps) {
         cursor: 'pointer',
       }}
     >
+      <TileFPSOverlay fps={fps} visible={showFPS} />
       <TileLabel
         label={tile.label}
         effectName={effectName}
@@ -123,6 +127,7 @@ export function TileView({ tile }: TileViewProps) {
           {tile.postEffects.length > 0 && (
             <PostEffectLayer effects={tile.postEffects} />
           )}
+          {showFPS && <TileFPSCounter onFPS={setFps} />}
         </RenderErrorBoundary>
       </View>
 
