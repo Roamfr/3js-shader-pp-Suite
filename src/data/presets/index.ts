@@ -427,7 +427,7 @@ uniform float time;
 uniform float scanlineIntensity; // min:0.0 max:1.0 step:0.01
 uniform float curvature; // min:0.0 max:0.5 step:0.01
 uniform float rgbOffset; // min:0.0 max:3.0 step:0.1
-uniform float resolution; // min:100.0 max:1000.0 step:10.0
+uniform float screenRes; // min:100.0 max:1000.0 step:10.0
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
   // Barrel distortion
@@ -444,12 +444,12 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   vec3 color = texture2D(inputBuffer, curved).rgb;
 
   // Scanlines
-  float scanline = sin(curved.y * resolution * 3.14159) * 0.5 + 0.5;
+  float scanline = sin(curved.y * screenRes * 3.14159) * 0.5 + 0.5;
   scanline = pow(scanline, 1.5) * scanlineIntensity;
   color *= 1.0 - scanline * 0.3;
 
   // RGB subpixel simulation
-  float px = curved.x * resolution;
+  float px = curved.x * screenRes;
   float subpixel = mod(px, 3.0);
   if (subpixel < 1.0) color.gb *= 1.0 - rgbOffset * 0.1;
   else if (subpixel < 2.0) color.rb *= 1.0 - rgbOffset * 0.1;
@@ -465,7 +465,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
       scanlineIntensity: f(0.5, 0.0, 1.0),
       curvature: f(0.1, 0.0, 0.5),
       rgbOffset: f(1.0, 0.0, 3.0, 0.1),
-      resolution: { type: 'float', value: 400, min: 100, max: 1000, step: 10 },
+      screenRes: { type: 'float', value: 400, min: 100, max: 1000, step: 10 },
     },
   },
 }
@@ -480,16 +480,17 @@ const pixelate: PresetDefinition = {
     name: 'Pixelate',
     fragmentShader: `
 uniform float pixelSize; // min:2.0 max:32.0 step:1.0
-uniform float resolution;
+uniform float screenRes; // min:100.0 max:1000.0 step:10.0
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-  float cellSize = pixelSize / resolution;
+  float cellSize = pixelSize / screenRes;
   vec2 pixelUv = floor(uv / cellSize) * cellSize + cellSize * 0.5;
   outputColor = texture2D(inputBuffer, pixelUv);
 }
 `.trim(),
     uniforms: {
       pixelSize: { type: 'float', value: 8, min: 2, max: 32, step: 1 },
+      screenRes: { type: 'float', value: 512, min: 100, max: 1000, step: 10 },
     },
   },
 }
@@ -546,13 +547,13 @@ const sobelEdge: PresetDefinition = {
     type: 'postprocessing',
     name: 'Sobel Edge Detection',
     fragmentShader: `
-uniform float resolution;
+uniform float screenRes; // min:100.0 max:1000.0 step:10.0
 uniform float threshold; // min:0.0 max:1.0 step:0.01
 uniform float mixAmount; // min:0.0 max:1.0 step:0.01
 uniform vec3 edgeColor; // min:0 max:1 step:0.01
 
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
-  vec2 texel = vec2(1.0) / vec2(resolution);
+  vec2 texel = vec2(1.0) / vec2(screenRes);
 
   // Sample 3x3 neighborhood (luminance)
   float tl = dot(texture2D(inputBuffer, uv + vec2(-texel.x, texel.y)).rgb, vec3(0.299, 0.587, 0.114));
@@ -578,6 +579,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 }
 `.trim(),
     uniforms: {
+      screenRes: { type: 'float', value: 512, min: 100, max: 1000, step: 10 },
       threshold: f(0.1, 0.0, 1.0),
       mixAmount: f(0.8, 0.0, 1.0),
       edgeColor: v3([1.0, 1.0, 1.0]),

@@ -3,7 +3,12 @@ import type { GridSize, ProjectJSON } from '../types/gallery'
 
 const STORAGE_KEY = 'shader-eval-gallery'
 
+// Bump this when the persisted data schema or shader format changes.
+// Old data with a lower (or missing) version is discarded on load.
+const STORAGE_VERSION = 2
+
 interface SavedState {
+  version?: number
   tiles: TileConfig[]
   gridSize: GridSize
 }
@@ -11,6 +16,7 @@ interface SavedState {
 export function saveGalleryState(tiles: TileConfig[], gridSize: GridSize): void {
   try {
     const data: SavedState = {
+      version: STORAGE_VERSION,
       tiles: tiles.map((t) => ({
         ...t,
         isGenerating: false,
@@ -30,6 +36,14 @@ export function loadGalleryState(): SavedState | null {
     if (!raw) return null
     const data = JSON.parse(raw) as SavedState
     if (!Array.isArray(data.tiles) || !data.gridSize) return null
+
+    // Discard stale data from older versions (may contain broken shaders
+    // with uniform conflicts like `uniform float resolution` vs built-in vec2).
+    if (!data.version || data.version < STORAGE_VERSION) {
+      localStorage.removeItem(STORAGE_KEY)
+      return null
+    }
+
     return data
   } catch {
     return null

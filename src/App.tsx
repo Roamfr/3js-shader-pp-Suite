@@ -89,26 +89,22 @@ export default function App() {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Gallery area — HTML grid that View components track */}
+      {/* Gallery area — contains both the HTML grid and the Canvas */}
       <main style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-        <GalleryGrid />
-      </main>
+        {/* HTML grid that View components track (rendered on top via z-index) */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+          <GalleryGrid />
+        </div>
 
-      {/* Single Canvas renders all Views via gl.scissor */}
-      <Canvas
-        eventSource={containerRef}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          pointerEvents: 'none',
-        }}
-        gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
-      >
-        <View.Port />
-      </Canvas>
+        {/* Canvas fills the main area; Views scissor into tracked HTML rects */}
+        <Canvas
+          eventSource={containerRef}
+          style={{ position: 'absolute', inset: 0 }}
+          gl={{ antialias: true }}
+        >
+          <View.Port />
+        </Canvas>
+      </main>
 
       {/* Dialogs */}
       <ImportDialog />

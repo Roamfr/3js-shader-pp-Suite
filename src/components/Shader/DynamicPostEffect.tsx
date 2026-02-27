@@ -7,10 +7,18 @@ function uniformConfigToValue(config: UniformConfig): unknown {
   return config.value
 }
 
+// Built-in uniforms provided by the postprocessing Effect class.
+// These must NOT be passed as custom uniforms or they'll cause type conflicts.
+const BUILTIN_UNIFORMS = new Set([
+  'inputBuffer', 'outputBuffer', 'resolution', 'texelSize',
+  'cameraNear', 'cameraFar', 'aspect', 'time',
+])
+
 class DynamicEffect extends Effect {
   constructor(name: string, fragmentShader: string, customUniforms: Record<string, UniformConfig>) {
     const uniforms = new Map<string, Uniform>()
     for (const [key, config] of Object.entries(customUniforms)) {
+      if (BUILTIN_UNIFORMS.has(key)) continue
       uniforms.set(key, new Uniform(uniformConfigToValue(config)))
     }
 

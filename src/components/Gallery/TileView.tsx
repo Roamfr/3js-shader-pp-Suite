@@ -1,13 +1,13 @@
-import { useRef, useCallback } from 'react'
+import { Suspense, useRef, useCallback } from 'react'
 import { View, PerspectiveCamera, OrbitControls } from '@react-three/drei'
-import { EffectComposer } from '@react-three/postprocessing'
 import { useUIStore } from '../../store/uiStore'
 import { useGalleryStore } from '../../store/galleryStore'
 import { ProceduralScene } from '../Scene/ProceduralScene'
 import { MaterialSpheres } from '../Scene/MaterialSpheres'
 import { EnvironmentScene } from '../Scene/EnvironmentScene'
 import { CustomGLTFScene } from '../Scene/CustomGLTFScene'
-import { DynamicPostEffect } from '../Shader/DynamicPostEffect'
+import { PostEffectLayer } from '../Shader/PostEffectLayer'
+import { RenderErrorBoundary } from '../Error/RenderErrorBoundary'
 import { TileLabel } from './TileLabel'
 import { TileControls } from './TileControls'
 import type { TileConfig, CameraState } from '../../types/tile'
@@ -81,11 +81,10 @@ export function TileView({ tile }: TileViewProps) {
         position: 'relative',
         width: '100%',
         height: '100%',
-        border: isSelected ? '2px solid #3b82f6' : '2px solid #333',
+        border: isSelected ? '2px solid #3b82f6' : '2px solid transparent',
         borderRadius: 6,
         overflow: 'hidden',
         cursor: 'pointer',
-        background: '#0a0a0a',
       }}
     >
       <TileLabel
@@ -99,6 +98,8 @@ export function TileView({ tile }: TileViewProps) {
       />
 
       <View style={{ width: '100%', height: '100%' }}>
+        {/* Scene background ensures the View's scissor rect is cleared each frame */}
+        <color attach="background" args={['#0a0a0a']} />
         <PerspectiveCamera
           makeDefault
           position={tile.cameraState.position}
@@ -108,15 +109,21 @@ export function TileView({ tile }: TileViewProps) {
           target={tile.cameraState.target}
           onEnd={handleCameraChange}
         />
-        <TileScene tile={tile} />
 
-        {tile.postEffects.length > 0 && (
-          <EffectComposer>
-            {tile.postEffects.map((effect, i) => (
-              <DynamicPostEffect key={`${effect.name}-${i}`} config={effect} />
-            ))}
-          </EffectComposer>
-        )}
+        <RenderErrorBoundary>
+          {/* Suspense boundary required inside View portals —
+              Environment (HDR), useGLTF, etc. suspend and there's no
+              inherited Suspense inside createPortal. Without this the
+              entire portal tree stays suspended (black) until a resize
+              forces React to re-evaluate. */}
+          <Suspense fallback={null}>
+            <TileScene tile={tile} />
+          </Suspense>
+
+          {tile.postEffects.length > 0 && (
+            <PostEffectLayer effects={tile.postEffects} />
+          )}
+        </RenderErrorBoundary>
       </View>
 
       {tile.error && (
