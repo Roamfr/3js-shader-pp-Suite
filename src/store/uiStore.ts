@@ -9,12 +9,16 @@ interface UIStore {
   shaderMode: ShaderMode
   cameraSyncEnabled: boolean
   apiKey: string
+  importDialogOpen: boolean
+  exportDialogOpen: boolean
 
   selectTile: (id: string | null) => void
   setSidebarPanel: (panel: SidebarPanel) => void
   setShaderMode: (mode: ShaderMode) => void
   toggleCameraSync: () => void
   setApiKey: (key: string) => void
+  setImportDialogOpen: (open: boolean) => void
+  setExportDialogOpen: (open: boolean) => void
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -23,6 +27,8 @@ export const useUIStore = create<UIStore>((set) => ({
   shaderMode: 'material',
   cameraSyncEnabled: false,
   apiKey: localStorage.getItem('anthropic-api-key') ?? '',
+  importDialogOpen: false,
+  exportDialogOpen: false,
 
   selectTile: (id) => set({ selectedTileId: id }),
   setSidebarPanel: (panel) => set({ sidebarPanel: panel }),
@@ -32,4 +38,6 @@ export const useUIStore = create<UIStore>((set) => ({
     localStorage.setItem('anthropic-api-key', key)
     set({ apiKey: key })
   },
+  setImportDialogOpen: (open) => set({ importDialogOpen: open }),
+  setExportDialogOpen: (open) => set({ exportDialogOpen: open }),
 }))

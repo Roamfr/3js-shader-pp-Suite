@@ -6,3 +6,10 @@ export interface GalleryState {
   tiles: TileConfig[]
   gridSize: GridSize
 }
+
+export interface ProjectJSON {
+  version: 1
+  exportedAt: string
+  gridSize: GridSize
+  tiles: TileConfig[]
+}

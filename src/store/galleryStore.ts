@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { TileConfig, SceneType, BuiltinModel, CameraState } from '../types/tile'
 import type { ShaderConfig, PostEffectConfig } from '../types/shader'
 import type { GridSize } from '../types/gallery'
+import { loadGalleryState } from '../lib/persistence'
 
 // Default camera: positioned at (3, 2, 5) looking at origin
 const DEFAULT_CAMERA: CameraState = {
@@ -44,6 +45,7 @@ interface GalleryStore {
   setCustomModelUrl: (id: string, url: string | null) => void
   setTileCameraState: (id: string, cameraState: CameraState) => void
   syncCameraToAll: (cameraState: CameraState) => void
+  hydrateFromSaved: (tiles: TileConfig[], gridSize: GridSize) => void
 }
 
 // Grid size to tile count mapping
@@ -53,14 +55,17 @@ const GRID_TILE_COUNTS: Record<GridSize, number> = {
   '3x3': 9,
 }
 
+// Synchronous hydration from localStorage
+const saved = loadGalleryState()
+
 export const useGalleryStore = create<GalleryStore>((set) => ({
-  tiles: [
+  tiles: saved?.tiles ?? [
     createDefaultTile('Tile 1'),
     createDefaultTile('Tile 2'),
     createDefaultTile('Tile 3'),
     createDefaultTile('Tile 4'),
   ],
-  gridSize: '2x2',
+  gridSize: saved?.gridSize ?? '2x2',
 
   setGridSize: (size) =>
     set((state) => {
@@ -157,4 +162,6 @@ export const useGalleryStore = create<GalleryStore>((set) => ({
     set((state) => ({
       tiles: state.tiles.map((t) => ({ ...t, cameraState })),
     })),
+
+  hydrateFromSaved: (tiles, gridSize) => set({ tiles, gridSize }),
 }))

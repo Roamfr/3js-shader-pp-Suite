@@ -4,6 +4,7 @@ import { GridSizeSelector } from '../Gallery/GridSizeSelector'
 import { SceneSelector } from '../Scene/SceneSelector'
 import { UniformPanel } from '../Controls/UniformPanel'
 import { CodePanel } from '../CodeViewer/CodePanel'
+import { PresetLibrary } from '../Presets/PresetLibrary'
 import { useUIStore } from '../../store/uiStore'
 
 type SidebarPanel = 'prompt' | 'controls' | 'code'
@@ -28,11 +29,25 @@ const activeTabStyle: React.CSSProperties = {
   borderBottomColor: '#3b82f6',
 }
 
+const actionBtnStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '8px 0',
+  fontSize: 12,
+  fontWeight: 600,
+  background: '#1a1a2e',
+  border: '1px solid #333',
+  borderRadius: 6,
+  color: '#ccc',
+  cursor: 'pointer',
+}
+
 export function Sidebar() {
   const sidebarPanel = useUIStore((s) => s.sidebarPanel) as SidebarPanel
   const setSidebarPanel = useUIStore((s) => s.setSidebarPanel)
   const cameraSyncEnabled = useUIStore((s) => s.cameraSyncEnabled)
   const toggleCameraSync = useUIStore((s) => s.toggleCameraSync)
+  const setImportDialogOpen = useUIStore((s) => s.setImportDialogOpen)
+  const setExportDialogOpen = useUIStore((s) => s.setExportDialogOpen)
 
   return (
     <aside
@@ -119,6 +134,35 @@ export function Sidebar() {
                 Scene
               </h2>
               <SceneSelector />
+            </section>
+
+            {/* Presets */}
+            <section>
+              <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Presets
+              </h2>
+              <PresetLibrary />
+            </section>
+
+            {/* Import / Export */}
+            <section>
+              <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Import / Export
+              </h2>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  style={actionBtnStyle}
+                  onClick={() => setImportDialogOpen(true)}
+                >
+                  Import
+                </button>
+                <button
+                  style={actionBtnStyle}
+                  onClick={() => setExportDialogOpen(true)}
+                >
+                  Export
+                </button>
+              </div>
             </section>
 
             {/* Camera sync */}
