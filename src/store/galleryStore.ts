@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { TileConfig, SceneType, CameraState } from '../types/tile'
+import type { TileConfig, SceneType, BuiltinModel, CameraState } from '../types/tile'
 import type { ShaderConfig, PostEffectConfig } from '../types/shader'
 import type { GridSize } from '../types/gallery'
 
@@ -14,6 +14,8 @@ function createDefaultTile(label: string): TileConfig {
     id: crypto.randomUUID(),
     label,
     sceneType: 'procedural',
+    builtinModel: 'DamagedHelmet',
+    customModelUrl: null,
     shader: null,
     postEffects: [],
     cameraState: { ...DEFAULT_CAMERA },
@@ -38,6 +40,8 @@ interface GalleryStore {
   setTileError: (id: string, error: string | null) => void
   setTileGenerating: (id: string, generating: boolean) => void
   setTileScene: (id: string, sceneType: SceneType) => void
+  setTileModel: (id: string, model: BuiltinModel) => void
+  setCustomModelUrl: (id: string, url: string | null) => void
   setTileCameraState: (id: string, cameraState: CameraState) => void
   syncCameraToAll: (cameraState: CameraState) => void
 }
@@ -132,6 +136,16 @@ export const useGalleryStore = create<GalleryStore>((set) => ({
   setTileScene: (id, sceneType) =>
     set((state) => ({
       tiles: state.tiles.map((t) => (t.id === id ? { ...t, sceneType } : t)),
+    })),
+
+  setTileModel: (id, model) =>
+    set((state) => ({
+      tiles: state.tiles.map((t) => (t.id === id ? { ...t, builtinModel: model } : t)),
+    })),
+
+  setCustomModelUrl: (id, url) =>
+    set((state) => ({
+      tiles: state.tiles.map((t) => (t.id === id ? { ...t, customModelUrl: url } : t)),
     })),
 
   setTileCameraState: (id, cameraState) =>

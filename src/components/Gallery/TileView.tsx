@@ -3,7 +3,10 @@ import { View, PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import { EffectComposer } from '@react-three/postprocessing'
 import { useUIStore } from '../../store/uiStore'
 import { useGalleryStore } from '../../store/galleryStore'
-import { ShaderTestScene } from '../Scene/ShaderTestScene'
+import { ProceduralScene } from '../Scene/ProceduralScene'
+import { MaterialSpheres } from '../Scene/MaterialSpheres'
+import { EnvironmentScene } from '../Scene/EnvironmentScene'
+import { CustomGLTFScene } from '../Scene/CustomGLTFScene'
 import { DynamicPostEffect } from '../Shader/DynamicPostEffect'
 import { TileLabel } from './TileLabel'
 import { TileControls } from './TileControls'
@@ -11,6 +14,20 @@ import type { TileConfig, CameraState } from '../../types/tile'
 
 interface TileViewProps {
   tile: TileConfig
+}
+
+function TileScene({ tile }: { tile: TileConfig }) {
+  switch (tile.sceneType) {
+    case 'materialSpheres':
+      return <MaterialSpheres shader={tile.shader} />
+    case 'environment':
+      return <EnvironmentScene shader={tile.shader} model={tile.builtinModel} />
+    case 'customGLTF':
+      return <CustomGLTFScene shader={tile.shader} modelUrl={tile.customModelUrl} />
+    case 'procedural':
+    default:
+      return <ProceduralScene shader={tile.shader} />
+  }
 }
 
 export function TileView({ tile }: TileViewProps) {
@@ -91,7 +108,7 @@ export function TileView({ tile }: TileViewProps) {
           target={tile.cameraState.target}
           onEnd={handleCameraChange}
         />
-        <ShaderTestScene shader={tile.shader} />
+        <TileScene tile={tile} />
 
         {tile.postEffects.length > 0 && (
           <EffectComposer>

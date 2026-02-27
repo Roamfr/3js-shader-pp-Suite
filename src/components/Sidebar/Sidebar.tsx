@@ -1,6 +1,7 @@
 import { PromptInput } from '../Prompt/PromptInput'
 import { APIKeyInput } from '../Settings/APIKeyInput'
 import { GridSizeSelector } from '../Gallery/GridSizeSelector'
+import { SceneSelector } from '../Scene/SceneSelector'
 import { useUIStore } from '../../store/uiStore'
 
 export function Sidebar() {
@@ -60,6 +61,14 @@ export function Sidebar() {
             Grid
           </h2>
           <GridSizeSelector />
+        </section>
+
+        {/* Scene selector */}
+        <section>
+          <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+            Scene
+          </h2>
+          <SceneSelector />
         </section>
 
         {/* Camera sync */}
