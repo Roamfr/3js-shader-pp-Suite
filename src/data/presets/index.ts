@@ -56,11 +56,16 @@ const toon: PresetDefinition = {
 uniform float levels; // min:2 max:8 step:1
 uniform vec3 baseColor; // min:0 max:1 step:0.01
 uniform float edgeThreshold; // min:0 max:1 step:0.01
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
+varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vPosition;
 
 void main() {
+  vec3 base = hasBaseMap ? texture2D(baseMap, vUv).rgb : baseColor;
+
   vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
   float NdotL = dot(vNormal, lightDir);
   float intensity = floor(NdotL * levels) / levels;
@@ -71,7 +76,7 @@ void main() {
   float edge = dot(vNormal, viewDir);
   float outline = smoothstep(edgeThreshold, edgeThreshold + 0.05, edge);
 
-  vec3 color = baseColor * intensity * outline;
+  vec3 color = base * intensity * outline;
   gl_FragColor = vec4(color, 1.0);
 }
 `.trim(),
@@ -97,6 +102,8 @@ uniform float time;
 uniform float scanSpeed; // min:0.5 max:5.0 step:0.1
 uniform float fresnelPower; // min:0.5 max:5.0 step:0.1
 uniform float scanDensity; // min:10.0 max:200.0 step:1.0
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -114,7 +121,10 @@ void main() {
   float scan = sin(vUv.y * scanDensity + time * scanSpeed) * 0.5 + 0.5;
   scan = smoothstep(0.3, 0.7, scan);
 
-  vec3 color = rainbow * (fresnel * 0.7 + 0.3) * (0.8 + 0.2 * scan);
+  // Blend holographic effect over original texture
+  vec3 texColor = hasBaseMap ? texture2D(baseMap, vUv).rgb : vec3(0.5);
+  vec3 holoColor = rainbow * (fresnel * 0.7 + 0.3) * (0.8 + 0.2 * scan);
+  vec3 color = mix(texColor, holoColor, fresnel * 0.8 + 0.2);
   float alpha = fresnel * 0.6 + 0.4;
 
   gl_FragColor = vec4(color, alpha);
@@ -143,6 +153,8 @@ uniform float time;
 uniform vec3 glowColor; // min:0 max:1 step:0.01
 uniform float thickness; // min:0.01 max:0.15 step:0.01
 uniform float pulse; // min:0.0 max:1.0 step:0.01
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
 varying vec2 vUv;
 varying vec3 vNormal;
@@ -161,8 +173,11 @@ void main() {
   // Pulse animation
   float p = 1.0 + pulse * sin(time * 3.0) * 0.3;
 
-  vec3 color = glowColor * (wire + fresnel * 0.5) * p;
-  float alpha = max(wire, fresnel * 0.3);
+  // Show texture through the wireframe gaps
+  vec3 texColor = hasBaseMap ? texture2D(baseMap, vUv).rgb : vec3(0.0);
+  vec3 wireColor = glowColor * (wire + fresnel * 0.5) * p;
+  vec3 color = mix(texColor * 0.3, wireColor, max(wire, fresnel * 0.5));
+  float alpha = max(wire, max(fresnel * 0.3, hasBaseMap ? 0.3 : 0.0));
 
   gl_FragColor = vec4(color, alpha);
 }
@@ -190,6 +205,8 @@ uniform float time;
 uniform float noiseScale; // min:1.0 max:20.0 step:0.5
 uniform float speed; // min:0.1 max:3.0 step:0.1
 uniform float colorMix; // min:0.0 max:1.0 step:0.01
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -219,12 +236,12 @@ void main() {
   float n2 = noise(uv * 1.5 - t * 0.7);
   float n = mix(n1, n2, 0.5);
 
-  // Normal-based coloring
-  vec3 normalColor = vNormal * 0.5 + 0.5;
+  // Use texture or normal-based coloring as base
+  vec3 baseColor = hasBaseMap ? texture2D(baseMap, vUv).rgb : (vNormal * 0.5 + 0.5);
   // Noise-based coloring
   vec3 noiseColor = vec3(n, noise(uv + 5.0 + t * 0.3), noise(uv + 10.0 - t * 0.5));
 
-  vec3 color = mix(normalColor, noiseColor, colorMix);
+  vec3 color = mix(baseColor, noiseColor, colorMix);
   gl_FragColor = vec4(color, 1.0);
 }
 `.trim(),
@@ -250,11 +267,16 @@ uniform float time;
 uniform float filmThickness; // min:0.1 max:3.0 step:0.01
 uniform float saturation; // min:0.0 max:2.0 step:0.01
 uniform vec3 baseColor; // min:0 max:1 step:0.01
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
+varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vPosition;
 
 void main() {
+  vec3 base = hasBaseMap ? texture2D(baseMap, vUv).rgb : baseColor;
+
   vec3 viewDir = normalize(-vPosition);
   float cosTheta = abs(dot(vNormal, viewDir));
 
@@ -264,7 +286,7 @@ void main() {
 
   // Mix base color with iridescence
   float fresnel = pow(1.0 - cosTheta, 3.0);
-  vec3 color = mix(baseColor, film, fresnel);
+  vec3 color = mix(base, film, fresnel);
 
   // Apply saturation
   float luma = dot(color, vec3(0.299, 0.587, 0.114));
@@ -296,6 +318,8 @@ uniform float progress; // min:0.0 max:1.0 step:0.01
 uniform float edgeWidth; // min:0.01 max:0.2 step:0.01
 uniform vec3 edgeColor; // min:0 max:1 step:0.01
 uniform vec3 baseColor; // min:0 max:1 step:0.01
+uniform sampler2D baseMap;
+uniform bool hasBaseMap;
 
 varying vec3 vNormal;
 varying vec2 vUv;
@@ -316,6 +340,8 @@ float noise(vec2 p) {
 }
 
 void main() {
+  vec3 base = hasBaseMap ? texture2D(baseMap, vUv).rgb : baseColor;
+
   float n = noise(vUv * 8.0 + time * 0.3);
   n = n * 0.5 + noise(vUv * 16.0) * 0.3 + noise(vUv * 32.0) * 0.2;
 
@@ -329,7 +355,7 @@ void main() {
   vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
   float diff = max(dot(vNormal, lightDir), 0.15);
 
-  vec3 color = mix(baseColor * diff, edgeColor * 2.0, edge);
+  vec3 color = mix(base * diff, edgeColor * 2.0, edge);
   gl_FragColor = vec4(color, 1.0);
 }
 `.trim(),

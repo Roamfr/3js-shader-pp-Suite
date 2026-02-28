@@ -79,10 +79,19 @@ export function useShaderOverride(scene: THREE.Group, shader: ShaderConfig | nul
       if (mat instanceof THREE.Material && EXEMPT_MATERIALS.has(mat.name)) return
       if (Array.isArray(mat) && mat.some((m) => EXEMPT_MATERIALS.has(m.name))) return
 
+      // Extract base color texture from original material (if any)
+      let baseMap: THREE.Texture | null = null
+      const firstMat = Array.isArray(mat) ? mat[0] : mat
+      if (firstMat && 'map' in firstMat && (firstMat as THREE.MeshStandardMaterial).map) {
+        baseMap = (firstMat as THREE.MeshStandardMaterial).map
+      }
+
       // Build uniforms (same as DynamicShaderMesh)
       const uniforms: Record<string, THREE.IUniform> = {
         time: { value: 0 },
         resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        baseMap: { value: baseMap },
+        hasBaseMap: { value: baseMap !== null },
       }
       for (const [name, uniformConfig] of Object.entries(shader.uniforms)) {
         uniforms[name] = uniformConfigToThreeUniform(uniformConfig)
