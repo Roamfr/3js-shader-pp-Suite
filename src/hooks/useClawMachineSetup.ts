@@ -74,6 +74,19 @@ export function useClawMachineSetup(scene: THREE.Group): ClawMachineRefs {
       maxZ: machineBounds.max.z - 1,
     }
 
+    // Clone materials on arm meshes so emissive glow is per-instance
+    clawArmRef.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh
+        if (mesh.material instanceof THREE.Material) {
+          mesh.material = mesh.material.clone()
+        }
+      }
+    })
+
+    // Ensure world matrices are computed before reparenting
+    scene.updateMatrixWorld(true)
+
     // Reparent clawArm under carriage so X/Z movement cascades
     const armWorldPos = new THREE.Vector3()
     clawArmRef.getWorldPosition(armWorldPos)
@@ -83,6 +96,7 @@ export function useClawMachineSetup(scene: THREE.Group): ClawMachineRefs {
     carriageRef.add(clawArmRef)
 
     // Convert world position to carriage's local space
+    carriageRef.updateMatrixWorld(true)
     const armLocalPos = carriageRef.worldToLocal(armWorldPos.clone())
     clawArmRef.position.copy(armLocalPos)
 
@@ -94,6 +108,7 @@ export function useClawMachineSetup(scene: THREE.Group): ClawMachineRefs {
     cableRef.getWorldPosition(cableWorldPos)
     cableRef.removeFromParent()
     carriageRef.add(cableRef)
+    carriageRef.updateMatrixWorld(true)
     const cableLocalPos = carriageRef.worldToLocal(cableWorldPos.clone())
     cableRef.position.copy(cableLocalPos)
 

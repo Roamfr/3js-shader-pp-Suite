@@ -46,13 +46,14 @@ export function ClawController({
   const homePosition = useRef(new THREE.Vector3())
   const cableRestScaleY = useRef(1)
   const armMaterials = useRef<THREE.MeshStandardMaterial[]>([])
+  const needsInit = useRef(true)
 
   // Store carriage home position and cable rest scale on init
   useEffect(() => {
     homePosition.current.copy(carriageRef.position)
     cableRestScaleY.current = cableRef.scale.y
 
-    // Collect arm materials for emissive glow
+    // Collect arm materials for emissive glow (already cloned per-instance in setup hook)
     const mats: THREE.MeshStandardMaterial[] = []
     clawArmRef.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
@@ -63,15 +64,8 @@ export function ClawController({
       }
     })
     armMaterials.current = mats
+    needsInit.current = true
   }, [carriageRef, cableRef, clawArmRef])
-
-  // Compute descent target Y (in carriage local space)
-  useEffect(() => {
-    const targetWorldY = floorBounds.max.y + 1.0
-    const carriageWorldY = new THREE.Vector3()
-    carriageRef.getWorldPosition(carriageWorldY)
-    descentTarget.current = armRestLocalY - (carriageWorldY.y - targetWorldY)
-  }, [floorBounds, carriageRef, armRestLocalY])
 
   // Spawn random prizes on mount
   useEffect(() => {
@@ -118,6 +112,15 @@ export function ClawController({
   }, [isActive, gameState.phase, gameState.grabbedPrize, clawArmRef, armRestLocalY, onReset])
 
   useFrame((_, delta) => {
+    // Compute descent target on first frame when world matrices are valid
+    if (needsInit.current) {
+      needsInit.current = false
+      const targetWorldY = floorBounds.max.y + 1.0
+      const carriageWorldY = new THREE.Vector3()
+      carriageRef.getWorldPosition(carriageWorldY)
+      descentTarget.current = armRestLocalY - (carriageWorldY.y - targetWorldY)
+    }
+
     if (!isActive) return
 
     // Update emissive glow based on game phase

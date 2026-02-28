@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { useUIStore } from '../store/uiStore'
 
 export interface ClawInput {
@@ -16,20 +16,6 @@ export function useClawInput(tileId: string): React.MutableRefObject<ClawInput> 
   const inputRef = useRef<ClawInput>({ moveDir: { x: 0, z: 0 }, actionPressed: false })
   const heldKeys = useRef(new Set<string>())
   const actionFired = useRef(false)
-
-  // Expose a callback for HUD buttons
-  const setMoveDir = useCallback((x: number, z: number) => {
-    inputRef.current.moveDir.x = x
-    inputRef.current.moveDir.z = z
-  }, [])
-
-  const triggerAction = useCallback(() => {
-    inputRef.current.actionPressed = true
-  }, [])
-
-  // Store callbacks on ref so HUD can access them
-  ;(inputRef as any).setMoveDir = setMoveDir
-  ;(inputRef as any).triggerAction = triggerAction
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
