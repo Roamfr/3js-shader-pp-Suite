@@ -7,6 +7,7 @@ const SCENE_OPTIONS: { value: SceneType; label: string }[] = [
   { value: 'materialSpheres', label: 'Material Spheres' },
   { value: 'environment', label: 'Environment (GLTF)' },
   { value: 'customGLTF', label: 'Custom GLTF' },
+  { value: 'clawGame', label: 'Claw Game' },
 ]
 
 const MODEL_OPTIONS: { value: BuiltinModel; label: string }[] = [

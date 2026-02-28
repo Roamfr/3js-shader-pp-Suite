@@ -1,6 +1,6 @@
 import type { ShaderConfig, PostEffectConfig } from './shader'
 
-export type SceneType = 'procedural' | 'materialSpheres' | 'environment' | 'customGLTF'
+export type SceneType = 'procedural' | 'materialSpheres' | 'environment' | 'customGLTF' | 'clawGame'
 
 export type BuiltinModel = 'DamagedHelmet' | 'Duck' | 'clawMachine'
 

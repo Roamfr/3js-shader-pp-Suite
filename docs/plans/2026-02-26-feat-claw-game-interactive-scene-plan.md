@@ -222,15 +222,15 @@ Y-axis (up)
 
 **Tasks:**
 
-- [ ] `src/types/tile.ts` — Add `'clawGame'` to `SceneType` union
-- [ ] `src/components/Scene/ClawGameScene.tsx` — New scene component:
+- [x] `src/types/tile.ts` — Add `'clawGame'` to `SceneType` union
+- [x] `src/components/Scene/ClawGameScene.tsx` — New scene component:
   - Loads `clawMachine.glb` via `useGLTF`
   - Calls `useClawMachineSetup` to extract refs and configure model
   - Renders model via `<primitive object={scene} />`
   - Accepts `shader: ShaderConfig | null` prop
   - Includes `<SceneLighting />`
   - Sets fixed camera position (angled front view)
-- [ ] `src/hooks/useClawMachineSetup.ts` — Model setup hook:
+- [x] `src/hooks/useClawMachineSetup.ts` — Model setup hook:
   - Traverses cloned scene graph once on load via `useMemo`
   - Finds `Cube.014_23` -> `carriageRef` (claw top, moves X/Z)
   - Finds `Cylinder.022_25` -> `clawArmRef` (claw bottom, descends Y)
@@ -244,10 +244,10 @@ Y-axis (up)
     3. Set local position to maintain same world position
   - Stores original arm local Y offset for descent animation baseline
   - Returns `{ carriageRef, clawArmRef, cableRef, floorRef, validPrizes, floorBounds }`
-- [ ] `src/components/Gallery/TileView.tsx` — Add `case 'clawGame'` to `TileScene` switch
-- [ ] `src/components/Scene/SceneSelector.tsx` — Add `{ value: 'clawGame', label: 'Claw Game' }` to `SCENE_OPTIONS`
+- [x] `src/components/Gallery/TileView.tsx` — Add `case 'clawGame'` to `TileScene` switch
+- [x] `src/components/Scene/SceneSelector.tsx` — Add `{ value: 'clawGame', label: 'Claw Game' }` to `SCENE_OPTIONS`
   - Hide the model sub-selector dropdown when `sceneType === 'clawGame'` (always uses clawMachine.glb)
-- [ ] Lazy-load decision: `EnvironmentScene.tsx` currently preloads `clawMachine.glb` at module level for all users. Consider moving the preload to `ClawGameScene.tsx` so the 12.7MB model only loads when a clawGame tile exists. Use `useGLTF.preload()` in `ClawGameScene` module scope.
+- [x] Lazy-load decision: `EnvironmentScene.tsx` currently preloads `clawMachine.glb` at module level for all users. Consider moving the preload to `ClawGameScene.tsx` so the 12.7MB model only loads when a clawGame tile exists. Use `useGLTF.preload()` in `ClawGameScene` module scope.
 
 **Success criteria:**
 - [ ] Can select "Claw Game" from scene dropdown

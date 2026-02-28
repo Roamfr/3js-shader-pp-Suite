@@ -6,6 +6,7 @@ import { ProceduralScene } from '../Scene/ProceduralScene'
 import { MaterialSpheres } from '../Scene/MaterialSpheres'
 import { EnvironmentScene } from '../Scene/EnvironmentScene'
 import { CustomGLTFScene } from '../Scene/CustomGLTFScene'
+import { ClawGameScene } from '../Scene/ClawGame/ClawGameScene'
 import { PostEffectLayer } from '../Shader/PostEffectLayer'
 import { RenderErrorBoundary } from '../Error/RenderErrorBoundary'
 import { TileFPSCounter, TileFPSOverlay } from '../Performance/TileFPS'
@@ -25,6 +26,8 @@ function TileScene({ tile }: { tile: TileConfig }) {
       return <EnvironmentScene shader={tile.shader} model={tile.builtinModel} />
     case 'customGLTF':
       return <CustomGLTFScene shader={tile.shader} modelUrl={tile.customModelUrl} />
+    case 'clawGame':
+      return <ClawGameScene shader={tile.shader} tileId={tile.id} />
     case 'procedural':
     default:
       return <ProceduralScene shader={tile.shader} />
