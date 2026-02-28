@@ -1,7 +1,7 @@
 ---
 title: "feat: Interactive Claw Game Scene"
 type: feat
-status: active
+status: completed
 date: 2026-02-26
 ---
 
