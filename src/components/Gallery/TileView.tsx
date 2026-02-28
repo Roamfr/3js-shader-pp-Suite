@@ -138,7 +138,7 @@ export function TileView({ tile }: TileViewProps) {
           enabled
         />
 
-        <RenderErrorBoundary>
+        <RenderErrorBoundary resetKey={tile.shader?.name ?? '' + tile.postEffects.length}>
           <Suspense fallback={null}>
             <TileScene tile={tile} />
           </Suspense>

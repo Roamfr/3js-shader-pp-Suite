@@ -29,16 +29,18 @@ CONSTRAINTS:
 - Prefer branchless math (mix, step, smoothstep) over if/else
 - Output ONLY the JSON, no markdown fences, no explanation`
 
-export const POSTPROCESSING_SYSTEM_PROMPT = `You are a GLSL shader expert for Three.js post-processing effects (pmndrs/postprocessing library).
+export const POSTPROCESSING_SYSTEM_PROMPT = `You are a GLSL shader expert for Three.js post-processing effects.
 
 Generate a fragment shader that implements a screen-space post-processing effect.
 
 INTERFACE CONTRACT:
 - Your shader must implement: void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
-- Built-in uniforms available: resolution, texelSize, cameraNear, cameraFar, aspect, time
-- inputColor = result of previous effects in the chain
+- inputColor = the color at the current pixel from previous effects
 - uv = screen UV coordinates (0..1)
-- You MAY declare additional uniforms
+- To sample the scene texture at arbitrary UVs, use: texture2D(inputBuffer, someUV)
+  (inputBuffer is a built-in sampler2D — do NOT declare it yourself)
+- Built-in uniforms (do NOT declare these): inputBuffer, resolution, time
+- You MAY declare additional custom uniforms for user-tunable parameters
 
 OUTPUT FORMAT (JSON):
 {
@@ -52,8 +54,11 @@ OUTPUT FORMAT (JSON):
 
 CONSTRAINTS:
 - Do NOT write void main() — only mainImage()
-- GLSL ES 3.0 compatible
+- Do NOT include #version directives or precision qualifiers — the host adds these
+- Use GLSL ES 1.0 syntax: texture2D() (not texture()), no in/out variable qualifiers
+- Do NOT declare uniform sampler2D inputBuffer, uniform vec2 resolution, or uniform float time — they are provided automatically
 - Max 64 loop iterations
+- All float literals must have decimal points (1.0 not 1)
 - Output ONLY the JSON, no markdown fences, no explanation`
 
 export const FIX_SHADER_PROMPT = (error: string) =>

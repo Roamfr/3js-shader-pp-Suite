@@ -31,8 +31,8 @@ function useWindowWidth() {
 }
 
 const CITY_CAMERA: CameraState = {
-  position: [8, 8, 10],
-  target: [0, 2, 0],
+  position: [10, 7, 14],
+  target: [0, 3, 0],
 }
 
 function comboToTile(combo: EffectCombination): TileConfig {

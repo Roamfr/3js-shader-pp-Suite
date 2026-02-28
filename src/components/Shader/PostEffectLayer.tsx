@@ -19,12 +19,17 @@ const BUILTIN_NAMES = new Set([
   'aspect',
 ])
 
-/** Strip declarations of built-in uniforms from user GLSL source. */
+/** Strip declarations of built-in uniforms, #version, and precision from user GLSL source. */
 function stripBuiltinDeclarations(source: string): string {
   let cleaned = source
+  // Remove #version directives (must be first line, but user code gets embedded mid-shader)
+  cleaned = cleaned.replace(/^\s*#version\s+.*$/gm, '')
+  // Remove precision qualifiers (wrapper already declares them)
+  cleaned = cleaned.replace(/^\s*precision\s+\w+\s+\w+\s*;/gm, '')
   for (const name of BUILTIN_NAMES) {
+    // Handle optional precision qualifiers like: uniform highp float time;
     cleaned = cleaned.replace(
-      new RegExp(`uniform\\s+\\w+\\s+${name}\\s*;`, 'g'),
+      new RegExp(`uniform\\s+(?:\\w+\\s+)*${name}\\s*;`, 'g'),
       ''
     )
   }
@@ -147,7 +152,8 @@ export function PostEffectLayer({ effects }: PostEffectLayerProps) {
         depthWrite: false,
         transparent: true, // renders in transparent pass so it's last
       })
-    } catch {
+    } catch (err) {
+      console.error('[PostEffectLayer] shader build failed:', err)
       return null
     }
   }, [effects, fbo.texture, size.width, size.height])

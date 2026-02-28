@@ -48,9 +48,9 @@ export function useShaderOverride(scene: THREE.Group, shader: ShaderConfig | nul
   const activeShaderKey = useRef<string | null>(null)
 
   useEffect(() => {
-    // Compute a key to detect shader changes
+    // Compute a content-based key to detect shader changes
     const shaderKey = shader
-      ? `${shader.vertexShader.length}:${shader.fragmentShader.length}:${shader.name}`
+      ? `${shader.name}:${shader.vertexShader}:${shader.fragmentShader}`
       : null
 
     // If shader hasn't changed, skip

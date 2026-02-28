@@ -6,13 +6,13 @@ import { loadGalleryState } from '../lib/persistence'
 
 // Default camera for the city model — elevated, slight downward angle
 const CITY_CAMERA: CameraState = {
-  position: [8, 8, 10],
-  target: [0, 2, 0],
+  position: [8, 8, 18],
+  target: [-1, 4, 0],
 }
 
 // Default camera for other models
 export const DEFAULT_CAMERAS: Record<string, CameraState> = {
-  lowPolyCity: { position: [8, 8, 10], target: [0, 2, 0] },
+  lowPolyCity: { position: [8, 8, 18], target: [-1, 4, 0] },
   DamagedHelmet: { position: [0, 0, 3], target: [0, 0, 0] },
   Duck: { position: [0, 1, 3], target: [0, 0.5, 0] },
   default: { position: [5, 3, 5], target: [0, 0, 0] },
