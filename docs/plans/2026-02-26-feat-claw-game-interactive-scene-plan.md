@@ -262,7 +262,7 @@ Y-axis (up)
 
 **Tasks:**
 
-- [ ] `src/hooks/useClawInput.ts` — Input hook:
+- [x] `src/hooks/useClawInput.ts` — Input hook:
   - Attaches `keydown`/`keyup` listeners via `useEffect` on `window`
   - Tracks held keys in a Set, derives movement direction vector each frame
   - Space bar = drop/grab action (single press, not hold)
@@ -271,20 +271,20 @@ Y-axis (up)
   - Guards: skips if `document.activeElement` is an `INPUT` or `TEXTAREA`
   - Calls `e.preventDefault()` on WASD, arrows, and Space when active (prevents page scroll and textarea typing)
   - Does NOT rely on browser key-repeat rate — uses `useFrame` for smooth per-tick movement
-- [ ] `src/App.tsx` — Keyboard conflict resolution:
+- [x] `src/App.tsx` — Keyboard conflict resolution:
   - Suppress Enter→focus-prompt when `selectedTile.sceneType === 'clawGame'`
   - Add `e.preventDefault()` for Space when claw game tile is active (prevents page scroll)
   - Allow Tab to still cycle tiles (game keys are only WASD/arrows/Space)
-- [ ] `src/components/Scene/ClawGame/ClawController.tsx` — Movement logic in `useFrame`:
+- [x] `src/components/Scene/ClawGame/ClawController.tsx` — Movement logic in `useFrame`:
   - Reads `carriageRef` from setup hook
   - Applies input to `carriageRef.position.x` and `carriageRef.position.z`
   - Clamps to machine interior bounds (derived from model bounding box at runtime)
   - Smooth movement via `lerp`, configurable speed (~3 units/sec)
   - Since arm is reparented under carriage, it moves automatically
-- [ ] Cable animation in `useFrame`:
+- [x] Cable animation in `useFrame`:
   - `Cylinder.038_24` (cable) should scale on Y to visually stretch/shrink as the arm descends/ascends
   - Cable connects from rail (Y≈17) to carriage — when carriage stays at Y≈15.4, cable is short; if arm descends, cable could stretch proportionally
-- [ ] Prize spawning logic (in `useClawMachineSetup` or separate util):
+- [x] Prize spawning logic (in `useClawMachineSetup` or separate util):
   - From the 43 valid `Plane.*` nodes (46 total minus 3 outliers), pick a random subset (e.g. 8-12)
   - Re-enable them (`visible = true`)
   - Use their existing model positions (already naturally scattered inside the machine at Y=5.6-8.5)

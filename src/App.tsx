@@ -94,8 +94,10 @@ export default function App() {
           ui.selectTile(null)
         }
 
-        // Enter = focus prompt input
+        // Enter = focus prompt input (suppress when claw game tile is active)
         if (e.key === 'Enter') {
+          const selectedTile = gallery.tiles.find((t) => t.id === ui.selectedTileId)
+          if (selectedTile?.sceneType === 'clawGame') return
           const promptInput = document.querySelector<HTMLTextAreaElement>(
             '[data-prompt-input]'
           )
