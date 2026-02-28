@@ -6,6 +6,7 @@ import { UniformPanel } from '../Controls/UniformPanel'
 import { CodePanel } from '../CodeViewer/CodePanel'
 import { PresetLibrary } from '../Presets/PresetLibrary'
 import { EffectChain } from '../Effects/EffectChain'
+import { EvalPanel } from '../Eval/EvalPanel'
 import { useUIStore } from '../../store/uiStore'
 
 type SidebarPanel = 'prompt' | 'controls' | 'code'
@@ -166,6 +167,14 @@ export function Sidebar() {
                 Presets
               </h2>
               <PresetLibrary />
+            </section>
+
+            {/* Auto Eval */}
+            <section>
+              <h2 style={{ margin: '0 0 8px', fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1 }}>
+                Auto Eval
+              </h2>
+              <EvalPanel />
             </section>
 
             {/* Import / Export */}
