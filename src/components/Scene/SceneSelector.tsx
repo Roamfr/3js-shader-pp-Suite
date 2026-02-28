@@ -11,6 +11,7 @@ const SCENE_OPTIONS: { value: SceneType; label: string }[] = [
 ]
 
 const MODEL_OPTIONS: { value: BuiltinModel; label: string }[] = [
+  { value: 'lowPolyCity', label: 'Low-Poly City' },
   { value: 'DamagedHelmet', label: 'Damaged Helmet' },
   { value: 'Duck', label: 'Duck' },
   { value: 'clawMachine', label: 'Claw Machine' },

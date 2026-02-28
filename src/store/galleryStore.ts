@@ -10,16 +10,22 @@ const DEFAULT_CAMERA: CameraState = {
   target: [0, 0, 0],
 }
 
+// Wider camera for the city model
+const CITY_CAMERA: CameraState = {
+  position: [30, 20, 30],
+  target: [0, 0, 0],
+}
+
 function createDefaultTile(label: string): TileConfig {
   return {
     id: crypto.randomUUID(),
     label,
-    sceneType: 'procedural',
-    builtinModel: 'DamagedHelmet',
+    sceneType: 'environment',
+    builtinModel: 'lowPolyCity',
     customModelUrl: null,
     shader: null,
     postEffects: [],
-    cameraState: { ...DEFAULT_CAMERA },
+    cameraState: { ...CITY_CAMERA },
     isGenerating: false,
     error: null,
     lastGoodShader: null,

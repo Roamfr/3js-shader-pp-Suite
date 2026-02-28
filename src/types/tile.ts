@@ -2,7 +2,7 @@ import type { ShaderConfig, PostEffectConfig } from './shader'
 
 export type SceneType = 'procedural' | 'materialSpheres' | 'environment' | 'customGLTF' | 'clawGame'
 
-export type BuiltinModel = 'DamagedHelmet' | 'Duck' | 'clawMachine'
+export type BuiltinModel = 'DamagedHelmet' | 'Duck' | 'clawMachine' | 'lowPolyCity'
 
 export interface CameraState {
   position: [number, number, number]
