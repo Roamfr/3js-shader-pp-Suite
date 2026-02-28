@@ -62,8 +62,6 @@ export function TileView({ tile }: TileViewProps) {
   const handleCameraChange = useCallback(
     (e: any) => {
       if (!e?.target) return
-      // Don't sync camera when claw game is active
-      if (isClawGame) return
 
       const controls = e.target
       const position: [number, number, number] = [
@@ -84,7 +82,7 @@ export function TileView({ tile }: TileViewProps) {
         setTileCameraState(tile.id, cameraState)
       }
     },
-    [cameraSyncEnabled, syncCameraToAll, setTileCameraState, tile.id, isClawGame]
+    [cameraSyncEnabled, syncCameraToAll, setTileCameraState, tile.id]
   )
 
   // Camera position: use fixed game camera for claw game, otherwise tile's camera state
@@ -131,7 +129,7 @@ export function TileView({ tile }: TileViewProps) {
         <OrbitControls
           target={cameraTarget}
           onEnd={handleCameraChange}
-          enabled={!clawGameActive}
+          enabled
         />
 
         <RenderErrorBoundary>

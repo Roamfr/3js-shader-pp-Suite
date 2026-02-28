@@ -18,6 +18,7 @@ interface ClawControllerProps {
   refs: ClawMachineRefs
   inputRef: React.MutableRefObject<ClawInput>
   isActive: boolean
+  shaderActive: boolean
   gameState: GameState
   onStartPositioning: () => void
   onStartDescending: () => void
@@ -30,6 +31,7 @@ export function ClawController({
   refs,
   inputRef,
   isActive,
+  shaderActive,
   gameState,
   onStartPositioning,
   onStartDescending,
@@ -123,15 +125,17 @@ export function ClawController({
 
     if (!isActive) return
 
-    // Update emissive glow based on game phase
-    const isGlowing = gameState.phase === 'DESCENDING' || gameState.phase === 'ASCENDING'
-    for (const mat of armMaterials.current) {
-      if (isGlowing) {
-        mat.emissive.copy(GLOW_COLOR)
-        mat.emissiveIntensity = 0.5
-      } else {
-        mat.emissive.setScalar(0)
-        mat.emissiveIntensity = 0
+    // Update emissive glow based on game phase (skip when shader overrides materials)
+    if (!shaderActive) {
+      const isGlowing = gameState.phase === 'DESCENDING' || gameState.phase === 'ASCENDING'
+      for (const mat of armMaterials.current) {
+        if (isGlowing) {
+          mat.emissive.copy(GLOW_COLOR)
+          mat.emissiveIntensity = 0.5
+        } else {
+          mat.emissive.setScalar(0)
+          mat.emissiveIntensity = 0
+        }
       }
     }
 

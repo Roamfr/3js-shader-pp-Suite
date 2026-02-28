@@ -3,6 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import { SceneLighting } from '../SceneLighting'
 import { useClawMachineSetup } from '../../../hooks/useClawMachineSetup'
 import { useClawInput } from '../../../hooks/useClawInput'
+import { useShaderOverride } from '../../../hooks/useShaderOverride'
 import { useClawGameState } from './useClawGameState'
 import { ClawController } from './ClawController'
 import { useClawGameStore } from './clawGameStore'
@@ -16,13 +17,14 @@ interface ClawGameSceneProps {
   tileId: string
 }
 
-export function ClawGameScene({ shader: _shader, tileId }: ClawGameSceneProps) {
+export function ClawGameScene({ shader, tileId }: ClawGameSceneProps) {
   const { scene } = useGLTF('/models/clawMachine.glb')
   const selectedTileId = useUIStore((s) => s.selectedTileId)
   const isActive = selectedTileId === tileId
 
   const clonedScene = useMemo(() => scene.clone(true), [scene])
   const refs = useClawMachineSetup(clonedScene)
+  const shaderActive = useShaderOverride(clonedScene, shader)
   const inputRef = useClawInput(tileId)
 
   const { state: gameState, startPositioning, startDescending, startAscending, showResult, reset } =
@@ -66,6 +68,7 @@ export function ClawGameScene({ shader: _shader, tileId }: ClawGameSceneProps) {
         refs={refs}
         inputRef={inputRef}
         isActive={isActive}
+        shaderActive={shaderActive}
         gameState={gameState}
         onStartPositioning={startPositioning}
         onStartDescending={startDescending}
