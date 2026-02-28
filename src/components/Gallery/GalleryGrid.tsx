@@ -62,6 +62,7 @@ export function GalleryGrid() {
   const isEvalMode = useEvalStore((s) => s.isEvalMode)
   const currentPage = useEvalStore((s) => s.currentPage)
   const filter = useEvalStore((s) => s.filter)
+  const pageSize = useEvalStore((s) => s.pageSize)
   const getCombinations = useEvalStore((s) => s.currentPageCombinations)
   const width = useWindowWidth()
 
@@ -69,7 +70,7 @@ export function GalleryGrid() {
     if (!isEvalMode) return null
     return getCombinations().map(comboToTile)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEvalMode, currentPage, filter])
+  }, [isEvalMode, currentPage, filter, pageSize])
 
   const displayTiles = evalTiles ?? tiles
 
