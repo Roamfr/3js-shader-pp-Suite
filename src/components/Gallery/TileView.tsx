@@ -48,6 +48,7 @@ export function TileView({ tile }: TileViewProps) {
   const [fps, setFps] = useState(0)
   const clearTile = useGalleryStore((s) => s.clearTile)
   const duplicateTile = useGalleryStore((s) => s.duplicateTile)
+  const resetTileCamera = useGalleryStore((s) => s.resetTileCamera)
   const syncCameraToAll = useGalleryStore((s) => s.syncCameraToAll)
   const setTileCameraState = useGalleryStore((s) => s.setTileCameraState)
 
@@ -114,13 +115,14 @@ export function TileView({ tile }: TileViewProps) {
       <TileControls
         onClear={() => clearTile(tile.id)}
         onDuplicate={() => duplicateTile(tile.id)}
+        onResetCamera={() => resetTileCamera(tile.id)}
       />
 
       {/* Claw game HUD overlay (HTML, only when selected) */}
       {clawGameActive && <ClawGameHUD tileId={tile.id} />}
 
       <View style={{ width: '100%', height: '100%' }}>
-        <color attach="background" args={['#0a0a0a']} />
+        <color attach="background" args={['#5b8fb9']} />
         <PerspectiveCamera
           makeDefault
           position={cameraPos}

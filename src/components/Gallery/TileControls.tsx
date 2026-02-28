@@ -1,9 +1,20 @@
 interface TileControlsProps {
   onClear: () => void
   onDuplicate: () => void
+  onResetCamera: () => void
 }
 
-export function TileControls({ onClear, onDuplicate }: TileControlsProps) {
+const btnStyle: React.CSSProperties = {
+  padding: '2px 6px',
+  background: 'rgba(0,0,0,0.6)',
+  color: '#aaa',
+  border: '1px solid #444',
+  borderRadius: 3,
+  cursor: 'pointer',
+  fontSize: 11,
+}
+
+export function TileControls({ onClear, onDuplicate, onResetCamera }: TileControlsProps) {
   return (
     <div
       style={{
@@ -14,37 +25,28 @@ export function TileControls({ onClear, onDuplicate }: TileControlsProps) {
         gap: 2,
         opacity: 0,
         transition: 'opacity 0.2s',
-        zIndex: 2,
+        zIndex: 10,
       }}
       className="tile-controls"
     >
       <button
+        onClick={(e) => { e.stopPropagation(); onResetCamera() }}
+        title="Reset camera to default view"
+        style={btnStyle}
+      >
+        home
+      </button>
+      <button
         onClick={(e) => { e.stopPropagation(); onDuplicate() }}
         title="Duplicate tile"
-        style={{
-          padding: '2px 6px',
-          background: 'rgba(0,0,0,0.6)',
-          color: '#aaa',
-          border: '1px solid #444',
-          borderRadius: 3,
-          cursor: 'pointer',
-          fontSize: 11,
-        }}
+        style={btnStyle}
       >
         dup
       </button>
       <button
         onClick={(e) => { e.stopPropagation(); onClear() }}
         title="Clear tile"
-        style={{
-          padding: '2px 6px',
-          background: 'rgba(0,0,0,0.6)',
-          color: '#ff6666',
-          border: '1px solid #444',
-          borderRadius: 3,
-          cursor: 'pointer',
-          fontSize: 11,
-        }}
+        style={{ ...btnStyle, color: '#ff6666' }}
       >
         clr
       </button>

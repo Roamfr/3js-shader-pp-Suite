@@ -3,12 +3,32 @@ import type { TileConfig, SceneType, BuiltinModel, CameraState } from '../types/
 import type { ShaderConfig, PostEffectConfig } from '../types/shader'
 import type { GridSize } from '../types/gallery'
 import { loadGalleryState } from '../lib/persistence'
+import { getPresetsByCategory } from '../data/presets/index'
 
-// Default camera for the city model (wider view)
+// Default camera for the city model — elevated, looking down
 const CITY_CAMERA: CameraState = {
-  position: [30, 20, 30],
+  position: [8, 10, 10],
   target: [0, 0, 0],
 }
+
+// Default camera for other models
+export const DEFAULT_CAMERAS: Record<string, CameraState> = {
+  lowPolyCity: { position: [8, 10, 10], target: [0, 0, 0] },
+  DamagedHelmet: { position: [0, 0, 3], target: [0, 0, 0] },
+  Duck: { position: [0, 1, 3], target: [0, 0.5, 0] },
+  default: { position: [5, 3, 5], target: [0, 0, 0] },
+}
+
+export function getDefaultCamera(model?: string): CameraState {
+  if (model && DEFAULT_CAMERAS[model]) return { ...DEFAULT_CAMERAS[model] }
+  return { ...DEFAULT_CAMERAS.default }
+}
+
+// Grab default presets for new tiles
+const defaultMaterial = getPresetsByCategory('material')[0]?.shader as ShaderConfig | undefined
+const defaultPostFX = getPresetsByCategory('postprocessing').find(
+  (p) => p.id === 'warm-color-grading'
+)?.shader as PostEffectConfig | undefined
 
 function createDefaultTile(label: string): TileConfig {
   return {
@@ -17,8 +37,8 @@ function createDefaultTile(label: string): TileConfig {
     sceneType: 'environment',
     builtinModel: 'lowPolyCity',
     customModelUrl: null,
-    shader: null,
-    postEffects: [],
+    shader: defaultMaterial ? { ...defaultMaterial } : null,
+    postEffects: defaultPostFX ? [{ ...defaultPostFX }] : [],
     cameraState: { ...CITY_CAMERA },
     isGenerating: false,
     error: null,
@@ -44,6 +64,7 @@ interface GalleryStore {
   setTileModel: (id: string, model: BuiltinModel) => void
   setCustomModelUrl: (id: string, url: string | null) => void
   setTileCameraState: (id: string, cameraState: CameraState) => void
+  resetTileCamera: (id: string) => void
   syncCameraToAll: (cameraState: CameraState) => void
   hydrateFromSaved: (tiles: TileConfig[], gridSize: GridSize) => void
 }
@@ -156,6 +177,15 @@ export const useGalleryStore = create<GalleryStore>((set) => ({
   setTileCameraState: (id, cameraState) =>
     set((state) => ({
       tiles: state.tiles.map((t) => (t.id === id ? { ...t, cameraState } : t)),
+    })),
+
+  resetTileCamera: (id) =>
+    set((state) => ({
+      tiles: state.tiles.map((t) =>
+        t.id === id
+          ? { ...t, cameraState: getDefaultCamera(t.builtinModel ?? undefined) }
+          : t
+      ),
     })),
 
   syncCameraToAll: (cameraState) =>

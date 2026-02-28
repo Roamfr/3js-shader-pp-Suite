@@ -31,7 +31,7 @@ function useWindowWidth() {
 }
 
 const CITY_CAMERA: CameraState = {
-  position: [30, 20, 30],
+  position: [8, 10, 10],
   target: [0, 0, 0],
 }
 

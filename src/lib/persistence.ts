@@ -5,7 +5,7 @@ const STORAGE_KEY = 'shader-eval-gallery'
 
 // Bump this when the persisted data schema or shader format changes.
 // Old data with a lower (or missing) version is discarded on load.
-const STORAGE_VERSION = 2
+const STORAGE_VERSION = 3
 
 interface SavedState {
   version?: number
