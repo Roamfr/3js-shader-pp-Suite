@@ -3,17 +3,16 @@ import type { TileConfig, SceneType, BuiltinModel, CameraState } from '../types/
 import type { ShaderConfig, PostEffectConfig } from '../types/shader'
 import type { GridSize } from '../types/gallery'
 import { loadGalleryState } from '../lib/persistence'
-import { getPresetsByCategory } from '../data/presets/index'
 
-// Default camera for the city model — elevated, looking down
+// Default camera for the city model — elevated, slight downward angle
 const CITY_CAMERA: CameraState = {
-  position: [8, 10, 10],
-  target: [0, 0, 0],
+  position: [8, 8, 10],
+  target: [0, 2, 0],
 }
 
 // Default camera for other models
 export const DEFAULT_CAMERAS: Record<string, CameraState> = {
-  lowPolyCity: { position: [8, 10, 10], target: [0, 0, 0] },
+  lowPolyCity: { position: [8, 8, 10], target: [0, 2, 0] },
   DamagedHelmet: { position: [0, 0, 3], target: [0, 0, 0] },
   Duck: { position: [0, 1, 3], target: [0, 0.5, 0] },
   default: { position: [5, 3, 5], target: [0, 0, 0] },
@@ -24,12 +23,6 @@ export function getDefaultCamera(model?: string): CameraState {
   return { ...DEFAULT_CAMERAS.default }
 }
 
-// Grab default presets for new tiles
-const defaultMaterial = getPresetsByCategory('material')[0]?.shader as ShaderConfig | undefined
-const defaultPostFX = getPresetsByCategory('postprocessing').find(
-  (p) => p.id === 'warm-color-grading'
-)?.shader as PostEffectConfig | undefined
-
 function createDefaultTile(label: string): TileConfig {
   return {
     id: crypto.randomUUID(),
@@ -37,8 +30,8 @@ function createDefaultTile(label: string): TileConfig {
     sceneType: 'environment',
     builtinModel: 'lowPolyCity',
     customModelUrl: null,
-    shader: defaultMaterial ? { ...defaultMaterial } : null,
-    postEffects: defaultPostFX ? [{ ...defaultPostFX }] : [],
+    shader: null,
+    postEffects: [],
     cameraState: { ...CITY_CAMERA },
     isGenerating: false,
     error: null,

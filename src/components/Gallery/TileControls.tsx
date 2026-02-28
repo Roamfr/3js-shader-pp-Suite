@@ -1,4 +1,5 @@
 interface TileControlsProps {
+  visible: boolean
   onClear: () => void
   onDuplicate: () => void
   onResetCamera: () => void
@@ -14,7 +15,7 @@ const btnStyle: React.CSSProperties = {
   fontSize: 11,
 }
 
-export function TileControls({ onClear, onDuplicate, onResetCamera }: TileControlsProps) {
+export function TileControls({ visible, onClear, onDuplicate, onResetCamera }: TileControlsProps) {
   return (
     <div
       style={{
@@ -23,11 +24,11 @@ export function TileControls({ onClear, onDuplicate, onResetCamera }: TileContro
         right: 4,
         display: 'flex',
         gap: 2,
-        opacity: 0,
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 0.2s',
         zIndex: 10,
       }}
-      className="tile-controls"
     >
       <button
         onClick={(e) => { e.stopPropagation(); onResetCamera() }}

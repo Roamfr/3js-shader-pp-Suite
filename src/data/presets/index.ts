@@ -69,7 +69,7 @@ void main() {
   vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
   float NdotL = dot(vNormal, lightDir);
   float intensity = floor(NdotL * levels) / levels;
-  intensity = max(intensity, 0.15);
+  intensity = max(intensity, 0.35);
 
   // Edge detection via view angle
   vec3 viewDir = normalize(-vPosition);

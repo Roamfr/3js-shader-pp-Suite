@@ -46,6 +46,7 @@ export function TileView({ tile }: TileViewProps) {
   const cameraSyncEnabled = useUIStore((s) => s.cameraSyncEnabled)
   const showFPS = useUIStore((s) => s.showFPS)
   const [fps, setFps] = useState(0)
+  const [hovered, setHovered] = useState(false)
   const clearTile = useGalleryStore((s) => s.clearTile)
   const duplicateTile = useGalleryStore((s) => s.duplicateTile)
   const resetTileCamera = useGalleryStore((s) => s.resetTileCamera)
@@ -96,6 +97,8 @@ export function TileView({ tile }: TileViewProps) {
     <div
       ref={containerRef}
       onClick={handleClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         position: 'relative',
         width: '100%',
@@ -113,6 +116,7 @@ export function TileView({ tile }: TileViewProps) {
         isGenerating={tile.isGenerating}
       />
       <TileControls
+        visible={hovered}
         onClear={() => clearTile(tile.id)}
         onDuplicate={() => duplicateTile(tile.id)}
         onResetCamera={() => resetTileCamera(tile.id)}

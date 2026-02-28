@@ -18,13 +18,15 @@ const filterBtnStyle = (active: boolean): React.CSSProperties => ({
   textTransform: 'uppercase',
 })
 
-const cardStyle: React.CSSProperties = {
-  padding: '8px 10px',
-  background: '#1a1a2e',
-  border: '1px solid #333',
-  borderRadius: 6,
-  cursor: 'pointer',
-  transition: 'border-color 0.15s',
+function cardStyle(active: boolean): React.CSSProperties {
+  return {
+    padding: '8px 10px',
+    background: active ? '#1e2a4a' : '#1a1a2e',
+    border: `1px solid ${active ? '#3b82f6' : '#333'}`,
+    borderRadius: 6,
+    cursor: 'pointer',
+    transition: 'border-color 0.15s, background 0.15s',
+  }
 }
 
 export function PresetLibrary() {
@@ -33,16 +35,22 @@ export function PresetLibrary() {
   const tiles = useGalleryStore((s) => s.tiles)
   const setShader = useGalleryStore((s) => s.setShader)
   const setPostEffect = useGalleryStore((s) => s.setPostEffect)
+  const clearTile = useGalleryStore((s) => s.clearTile)
   const pushSnapshot = useHistoryStore((s) => s.pushSnapshot)
 
   const tileId = selectedTileId ?? tiles[0]?.id
+  const activeTile = tiles.find((t) => t.id === tileId)
+
+  // Determine which preset is active on the current tile
+  const activeShaderName = activeTile?.shader?.name ?? null
+  const activePostFXName = activeTile?.postEffects[0]?.name ?? null
+  const isBlank = !activeShaderName && !activePostFXName
 
   const filteredPresets = filter === 'all' ? PRESETS : PRESETS.filter((p) => p.category === filter)
 
   const applyPreset = useCallback((preset: PresetDefinition) => {
     if (!tileId) return
 
-    // Push undo snapshot
     const tile = tiles.find((t) => t.id === tileId)
     if (tile) {
       pushSnapshot(tileId, { shader: tile.shader, postEffects: tile.postEffects })
@@ -54,6 +62,22 @@ export function PresetLibrary() {
       setPostEffect(tileId, [preset.shader])
     }
   }, [tileId, tiles, setShader, setPostEffect, pushSnapshot])
+
+  const applyBlank = useCallback(() => {
+    if (!tileId) return
+
+    const tile = tiles.find((t) => t.id === tileId)
+    if (tile) {
+      pushSnapshot(tileId, { shader: tile.shader, postEffects: tile.postEffects })
+    }
+
+    clearTile(tileId)
+  }, [tileId, tiles, clearTile, pushSnapshot])
+
+  function isPresetActive(preset: PresetDefinition): boolean {
+    if (preset.category === 'material') return activeShaderName === preset.name
+    return activePostFXName === preset.name
+  }
 
   return (
     <div>
@@ -72,23 +96,42 @@ export function PresetLibrary() {
         maxHeight: 200,
         overflowY: 'auto',
       }}>
-        {filteredPresets.map((preset) => (
-          <div
-            key={preset.id}
-            style={cardStyle}
-            onClick={() => applyPreset(preset)}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#3b82f6' }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = '#333' }}
-            title={preset.description}
-          >
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#ddd', marginBottom: 2 }}>
-              {preset.name}
-            </div>
-            <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase' }}>
-              {preset.category === 'material' ? 'MAT' : 'FX'}
-            </div>
+        {/* Blank / No Style card */}
+        <div
+          style={cardStyle(isBlank)}
+          onClick={applyBlank}
+          onMouseEnter={(e) => { if (!isBlank) e.currentTarget.style.borderColor = '#3b82f6' }}
+          onMouseLeave={(e) => { if (!isBlank) e.currentTarget.style.borderColor = '#333' }}
+          title="Remove all shaders and effects"
+        >
+          <div style={{ fontSize: 11, fontWeight: 600, color: isBlank ? '#fff' : '#ddd', marginBottom: 2 }}>
+            No Style
           </div>
-        ))}
+          <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase' }}>
+            BLANK
+          </div>
+        </div>
+
+        {filteredPresets.map((preset) => {
+          const active = isPresetActive(preset)
+          return (
+            <div
+              key={preset.id}
+              style={cardStyle(active)}
+              onClick={() => applyPreset(preset)}
+              onMouseEnter={(e) => { if (!active) e.currentTarget.style.borderColor = '#3b82f6' }}
+              onMouseLeave={(e) => { if (!active) e.currentTarget.style.borderColor = '#333' }}
+              title={preset.description}
+            >
+              <div style={{ fontSize: 11, fontWeight: 600, color: active ? '#fff' : '#ddd', marginBottom: 2 }}>
+                {preset.name}
+              </div>
+              <div style={{ fontSize: 9, color: '#666', textTransform: 'uppercase' }}>
+                {preset.category === 'material' ? 'MAT' : 'FX'}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {!tileId && (
