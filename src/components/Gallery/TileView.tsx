@@ -7,6 +7,7 @@ import { MaterialSpheres } from '../Scene/MaterialSpheres'
 import { EnvironmentScene } from '../Scene/EnvironmentScene'
 import { CustomGLTFScene } from '../Scene/CustomGLTFScene'
 import { ClawGameScene } from '../Scene/ClawGame/ClawGameScene'
+import { ClawGameHUD } from '../Scene/ClawGame/ClawGameHUD'
 import { PostEffectLayer } from '../Shader/PostEffectLayer'
 import { RenderErrorBoundary } from '../Error/RenderErrorBoundary'
 import { TileFPSCounter, TileFPSOverlay } from '../Performance/TileFPS'
@@ -17,6 +18,10 @@ import type { TileConfig, CameraState } from '../../types/tile'
 interface TileViewProps {
   tile: TileConfig
 }
+
+// Fixed camera for claw game: front-angled view showing the machine
+const CLAW_GAME_CAMERA_POS: [number, number, number] = [0, 14, 18]
+const CLAW_GAME_CAMERA_TARGET: [number, number, number] = [0, 8, 0]
 
 function TileScene({ tile }: { tile: TileConfig }) {
   switch (tile.sceneType) {
@@ -47,6 +52,8 @@ export function TileView({ tile }: TileViewProps) {
   const setTileCameraState = useGalleryStore((s) => s.setTileCameraState)
 
   const isSelected = selectedTileId === tile.id
+  const isClawGame = tile.sceneType === 'clawGame'
+  const clawGameActive = isClawGame && isSelected
 
   const handleClick = useCallback(() => {
     selectTile(tile.id)
@@ -55,6 +62,9 @@ export function TileView({ tile }: TileViewProps) {
   const handleCameraChange = useCallback(
     (e: any) => {
       if (!e?.target) return
+      // Don't sync camera when claw game is active
+      if (isClawGame) return
+
       const controls = e.target
       const position: [number, number, number] = [
         controls.object.position.x,
@@ -74,8 +84,12 @@ export function TileView({ tile }: TileViewProps) {
         setTileCameraState(tile.id, cameraState)
       }
     },
-    [cameraSyncEnabled, syncCameraToAll, setTileCameraState, tile.id]
+    [cameraSyncEnabled, syncCameraToAll, setTileCameraState, tile.id, isClawGame]
   )
+
+  // Camera position: use fixed game camera for claw game, otherwise tile's camera state
+  const cameraPos = isClawGame ? CLAW_GAME_CAMERA_POS : tile.cameraState.position
+  const cameraTarget = isClawGame ? CLAW_GAME_CAMERA_TARGET : tile.cameraState.target
 
   const effectName = tile.shader?.name ?? tile.postEffects[0]?.name
 
@@ -104,25 +118,23 @@ export function TileView({ tile }: TileViewProps) {
         onDuplicate={() => duplicateTile(tile.id)}
       />
 
+      {/* Claw game HUD overlay (HTML, only when selected) */}
+      {clawGameActive && <ClawGameHUD tileId={tile.id} />}
+
       <View style={{ width: '100%', height: '100%' }}>
-        {/* Scene background ensures the View's scissor rect is cleared each frame */}
         <color attach="background" args={['#0a0a0a']} />
         <PerspectiveCamera
           makeDefault
-          position={tile.cameraState.position}
+          position={cameraPos}
           fov={50}
         />
         <OrbitControls
-          target={tile.cameraState.target}
+          target={cameraTarget}
           onEnd={handleCameraChange}
+          enabled={!clawGameActive}
         />
 
         <RenderErrorBoundary>
-          {/* Suspense boundary required inside View portals —
-              Environment (HDR), useGLTF, etc. suspend and there's no
-              inherited Suspense inside createPortal. Without this the
-              entire portal tree stays suspended (black) until a resize
-              forces React to re-evaluate. */}
           <Suspense fallback={null}>
             <TileScene tile={tile} />
           </Suspense>

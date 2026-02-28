@@ -160,7 +160,10 @@ export const useGalleryStore = create<GalleryStore>((set) => ({
 
   syncCameraToAll: (cameraState) =>
     set((state) => ({
-      tiles: state.tiles.map((t) => ({ ...t, cameraState })),
+      // Exclude clawGame tiles from camera sync — they use a fixed game camera
+      tiles: state.tiles.map((t) =>
+        t.sceneType === 'clawGame' ? t : { ...t, cameraState }
+      ),
     })),
 
   hydrateFromSaved: (tiles, gridSize) => set({ tiles, gridSize }),

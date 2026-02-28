@@ -1,13 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useCallback } from 'react'
 import { useGLTF } from '@react-three/drei'
 import { SceneLighting } from '../SceneLighting'
 import { useClawMachineSetup } from '../../../hooks/useClawMachineSetup'
 import { useClawInput } from '../../../hooks/useClawInput'
+import { useClawGameState } from './useClawGameState'
 import { ClawController } from './ClawController'
+import { useClawGameStore } from './clawGameStore'
 import { useUIStore } from '../../../store/uiStore'
 import type { ShaderConfig } from '../../../types/shader'
 
-// Only preload when this module is imported (lazy)
 useGLTF.preload('/models/clawMachine.glb')
 
 interface ClawGameSceneProps {
@@ -20,19 +21,58 @@ export function ClawGameScene({ shader: _shader, tileId }: ClawGameSceneProps) {
   const selectedTileId = useUIStore((s) => s.selectedTileId)
   const isActive = selectedTileId === tileId
 
-  // Clone so each tile gets its own instance
   const clonedScene = useMemo(() => scene.clone(true), [scene])
-
-  // Extract node references and configure the model
   const refs = useClawMachineSetup(clonedScene)
-
-  // Input handling
   const inputRef = useClawInput(tileId)
+
+  const { state: gameState, startPositioning, startDescending, startAscending, showResult, reset } =
+    useClawGameState()
+
+  // Sync game state to zustand store for HTML HUD
+  const setTileState = useClawGameStore((s) => s.setTileState)
+  const setTileInputs = useClawGameStore((s) => s.setTileInputs)
+  const removeTile = useClawGameStore((s) => s.removeTile)
+
+  useEffect(() => {
+    setTileState(tileId, {
+      phase: gameState.phase,
+      statusText: gameState.statusText,
+      grabSuccess: gameState.grabSuccess,
+    })
+  }, [tileId, gameState.phase, gameState.statusText, gameState.grabSuccess, setTileState])
+
+  // Register input callbacks for HUD buttons
+  const setMoveDir = useCallback((x: number, z: number) => {
+    inputRef.current.moveDir.x = x
+    inputRef.current.moveDir.z = z
+  }, [inputRef])
+
+  const triggerAction = useCallback(() => {
+    inputRef.current.actionPressed = true
+  }, [inputRef])
+
+  useEffect(() => {
+    setTileInputs(tileId, { setMoveDir, triggerAction })
+  }, [tileId, setMoveDir, triggerAction, setTileInputs])
+
+  useEffect(() => {
+    return () => removeTile(tileId)
+  }, [tileId, removeTile])
 
   return (
     <group>
       <primitive object={clonedScene} />
-      <ClawController refs={refs} inputRef={inputRef} isActive={isActive} />
+      <ClawController
+        refs={refs}
+        inputRef={inputRef}
+        isActive={isActive}
+        gameState={gameState}
+        onStartPositioning={startPositioning}
+        onStartDescending={startDescending}
+        onStartAscending={startAscending}
+        onShowResult={showResult}
+        onReset={reset}
+      />
       <SceneLighting />
     </group>
   )
