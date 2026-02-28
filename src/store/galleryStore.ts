@@ -4,13 +4,7 @@ import type { ShaderConfig, PostEffectConfig } from '../types/shader'
 import type { GridSize } from '../types/gallery'
 import { loadGalleryState } from '../lib/persistence'
 
-// Default camera: positioned at (3, 2, 5) looking at origin
-const DEFAULT_CAMERA: CameraState = {
-  position: [3, 2, 5],
-  target: [0, 0, 0],
-}
-
-// Wider camera for the city model
+// Default camera for the city model (wider view)
 const CITY_CAMERA: CameraState = {
   position: [30, 20, 30],
   target: [0, 0, 0],
