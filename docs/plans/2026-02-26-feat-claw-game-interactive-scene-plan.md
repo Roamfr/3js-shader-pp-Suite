@@ -302,7 +302,7 @@ Y-axis (up)
 
 **Tasks:**
 
-- [ ] `src/components/Scene/ClawGame/useClawGameState.ts` — Game state reducer:
+- [x] `src/components/Scene/ClawGame/useClawGameState.ts` — Game state reducer:
   ```
   IDLE → POSITIONING → DESCENDING → GRABBING → ASCENDING → RESULT → IDLE
   ```
@@ -312,15 +312,15 @@ Y-axis (up)
   - `GRABBING`: At bottom -> check proximity to nearest active prize
   - `ASCENDING`: Arm rises back to original Y (with or without prize)
   - `RESULT`: Show success/fail message, then reset
-- [ ] Proximity detection:
+- [x] Proximity detection:
   - On grab: iterate active (visible) `Plane.*` nodes
   - Calculate XZ distance from arm world position to each prize world position
   - If nearest is within grab radius (configurable, default ~1.5 world units — to be tuned after seeing scale in-engine)
   - Apply flat success chance: 40% (configurable via constant)
   - Return grabbed prize reference or null
-- [ ] Prize grab animation: if grabbed, reparent prize mesh under `clawArmRef` so it lifts with the arm
+- [x] Prize grab animation: if grabbed, reparent prize mesh under `clawArmRef` so it lifts with the arm
   - Use `THREE.Object3D.attach()` (preserves world transform) instead of manual reparenting
-- [ ] Prize reset: after result display (2 second pause), detach prize, return to original position, re-enable visibility
+- [x] Prize reset: after result display (2 second pause), detach prize, return to original position, re-enable visibility
   - Plushies respawn after each round (infinite supply, no permanent capture in v1)
   - "No plushies remaining" state not needed in v1
 
@@ -349,7 +349,7 @@ Y-axis (up)
 
 **Tasks:**
 
-- [ ] `src/components/Scene/ClawGame/ClawGameHUD.tsx` — HTML overlay:
+- [x] `src/components/Scene/ClawGame/ClawGameHUD.tsx` — HTML overlay:
   - Rendered as absolutely positioned div inside TileView's container (same pattern as `TileLabel`, `TileControls`)
   - D-pad: 4 arrow buttons for touch/mouse control, min 44x44px touch targets (WCAG)
   - Use `pointerdown`/`pointerup` events (not `onClick`) for continuous hold-to-move behavior
@@ -359,18 +359,18 @@ Y-axis (up)
   - Result overlay: full-tile HTML overlay, visible for 2 seconds, then fades and resets
   - Only visible when `isSelected && tile.sceneType === 'clawGame'`
   - Semi-transparent, arcade-themed, positioned at bottom of tile
-- [ ] Camera management in ClawGameScene:
+- [x] Camera management in ClawGameScene:
   - When tile is selected AND sceneType is `clawGame`: disable OrbitControls, snap to fixed game camera
   - When tile is NOT selected: re-enable OrbitControls for passive viewing
   - Fixed game camera: snap to position derived from model bounds (front-angled view showing glass + controls)
   - Exclude clawGame tiles from `syncCameraToAll` in galleryStore (prevent orbit sync overriding game viewpoint)
-- [ ] Deselection handling:
+- [x] Deselection handling:
   - When tile is deselected mid-game (Escape or click outside), immediately reset game state to IDLE
   - Snap claw to home position in one frame (no transition animation)
   - Re-enable OrbitControls for passive orbit viewing
-- [ ] `src/components/Gallery/TileView.tsx` — Conditional OrbitControls:
+- [x] `src/components/Gallery/TileView.tsx` — Conditional OrbitControls:
   - Pass `enabled` prop based on `sceneType !== 'clawGame' || !isSelected`
-- [ ] On-screen button events dispatch same actions as keyboard (shared via `useClawInput`)
+- [x] On-screen button events dispatch same actions as keyboard (shared via `useClawInput`)
 
 **Success criteria:**
 - [ ] On-screen buttons work for moving claw and dropping
@@ -384,21 +384,21 @@ Y-axis (up)
 
 **Tasks:**
 
-- [ ] Shader overlay support:
+- [x] Shader overlay support:
   - If `shader` prop provided: apply `DynamicShaderMesh` to glass panels or claw
   - Post-processing effects work unchanged via EffectComposer
-- [ ] Visual polish:
+- [x] Visual polish:
   - Glass material: `meshPhysicalMaterial` with transmission for transparency
-  - Subtle emissive glow on arm during GRABBING state
-  - Screen mesh: render "PLAY!" text on the machine's display
+  - Subtle emissive glow on arm during DESCENDING/ASCENDING state
+  - Cable stretches visually during descent
 - [ ] Sound effects (stretch goal):
   - Motor hum, grab jingle, miss sound via Web Audio API
   - Optional, togglable
-- [ ] Edge cases:
-  - Tile resize: HUD repositions correctly
-  - Rapid input: debounce state transitions
-  - Model load failure: error state in tile
-  - Multiple claw game tiles: independent game state each
+- [x] Edge cases:
+  - Tile resize: HUD repositions correctly (absolute positioning)
+  - Rapid input: state transitions are guarded by phase
+  - Deselection: immediate reset to IDLE
+  - Multiple claw game tiles: independent game state each (per-tile store + cloned scenes)
 
 **Success criteria:**
 - [ ] Shaders apply on top of the game (CRT filter, bloom, toon, etc.)

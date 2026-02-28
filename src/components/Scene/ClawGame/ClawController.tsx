@@ -12,6 +12,7 @@ const ASCENT_SPEED = 3.0
 const GRAB_RADIUS = 2.0
 const GRAB_CHANCE = 0.4
 const RESULT_DURATION = 2.0
+const GLOW_COLOR = new THREE.Color(1.0, 0.4, 0.6) // Pink glow
 
 interface ClawControllerProps {
   refs: ClawMachineRefs
@@ -36,18 +37,33 @@ export function ClawController({
   onShowResult,
   onReset,
 }: ClawControllerProps) {
-  const { carriageRef, clawArmRef, moveBounds, armRestLocalY, validPrizes, floorBounds } = refs
+  const { carriageRef, clawArmRef, cableRef, moveBounds, armRestLocalY, validPrizes, floorBounds } = refs
   const initialized = useRef(false)
   const resultTimer = useRef(0)
   const descentTarget = useRef(0)
   const originalPrizeParent = useRef<THREE.Object3D | null>(null)
   const originalPrizePos = useRef(new THREE.Vector3())
   const homePosition = useRef(new THREE.Vector3())
+  const cableRestScaleY = useRef(1)
+  const armMaterials = useRef<THREE.MeshStandardMaterial[]>([])
 
-  // Store carriage home position on init
+  // Store carriage home position and cable rest scale on init
   useEffect(() => {
     homePosition.current.copy(carriageRef.position)
-  }, [carriageRef])
+    cableRestScaleY.current = cableRef.scale.y
+
+    // Collect arm materials for emissive glow
+    const mats: THREE.MeshStandardMaterial[] = []
+    clawArmRef.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mat = (child as THREE.Mesh).material
+        if (mat instanceof THREE.MeshStandardMaterial) {
+          mats.push(mat)
+        }
+      }
+    })
+    armMaterials.current = mats
+  }, [carriageRef, cableRef, clawArmRef])
 
   // Compute descent target Y (in carriage local space)
   useEffect(() => {
@@ -90,6 +106,12 @@ export function ClawController({
         originalPrizeParent.current = null
       }
 
+      // Reset emissive
+      for (const mat of armMaterials.current) {
+        mat.emissive.setScalar(0)
+        mat.emissiveIntensity = 0
+      }
+
       resultTimer.current = 0
       onReset()
     }
@@ -98,11 +120,27 @@ export function ClawController({
   useFrame((_, delta) => {
     if (!isActive) return
 
+    // Update emissive glow based on game phase
+    const isGlowing = gameState.phase === 'DESCENDING' || gameState.phase === 'ASCENDING'
+    for (const mat of armMaterials.current) {
+      if (isGlowing) {
+        mat.emissive.copy(GLOW_COLOR)
+        mat.emissiveIntensity = 0.5
+      } else {
+        mat.emissive.setScalar(0)
+        mat.emissiveIntensity = 0
+      }
+    }
+
+    // Update cable stretch: scale Y proportionally to arm descent
+    const armDelta = armRestLocalY - clawArmRef.position.y
+    const stretchFactor = 1 + armDelta * 0.15
+    cableRef.scale.y = cableRestScaleY.current * Math.max(1, stretchFactor)
+
     switch (gameState.phase) {
       case 'POSITIONING': {
         const { moveDir, actionPressed } = inputRef.current
 
-        // Move carriage on X/Z
         if (moveDir.x !== 0 || moveDir.z !== 0) {
           const speed = CARRIAGE_SPEED * delta
           carriageRef.position.x += moveDir.x * speed
@@ -118,7 +156,6 @@ export function ClawController({
           )
         }
 
-        // Space = start descent
         if (actionPressed) {
           inputRef.current.actionPressed = false
           onStartDescending()
@@ -132,7 +169,6 @@ export function ClawController({
         if (clawArmRef.position.y <= descentTarget.current) {
           clawArmRef.position.y = descentTarget.current
 
-          // Check proximity to prizes
           const armWorldPos = new THREE.Vector3()
           clawArmRef.getWorldPosition(armWorldPos)
 
@@ -184,7 +220,6 @@ export function ClawController({
         if (resultTimer.current >= RESULT_DURATION) {
           resultTimer.current = 0
 
-          // Release grabbed prize back to original position
           if (gameState.grabbedPrize && originalPrizeParent.current) {
             originalPrizeParent.current.attach(gameState.grabbedPrize)
             gameState.grabbedPrize.position.copy(originalPrizePos.current)
