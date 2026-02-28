@@ -14,6 +14,9 @@ const BUILTIN_NAMES = new Set([
   'resolution',
   'texelSize',
   'time',
+  'cameraNear',
+  'cameraFar',
+  'aspect',
 ])
 
 /** Strip declarations of built-in uniforms from user GLSL source. */
@@ -40,7 +43,7 @@ function buildFragmentShader(effects: PostEffectConfig[]): string {
   const bodies: string[] = []
   for (let i = 0; i < effects.length; i++) {
     let code = stripBuiltinDeclarations(effects[i].fragmentShader)
-    code = code.replace(/void\s+mainImage\s*\(/g, `void mainImage_${i}(`)
+    code = code.replace(/^(\s*)void(\s+)mainImage(\s*)\(/gm, `$1void$2mainImage_${i}$3(`)
     bodies.push(code)
   }
 
@@ -131,7 +134,7 @@ export function PostEffectLayer({ effects }: PostEffectLayerProps) {
 
       for (const effect of effects) {
         for (const [key, config] of Object.entries(effect.uniforms)) {
-          if (BUILTIN_NAMES.has(key) || uniforms[key]) continue
+          if (BUILTIN_NAMES.has(key)) continue
           uniforms[key] = { value: config.value }
         }
       }
